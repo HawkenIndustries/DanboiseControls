@@ -1,0 +1,12 @@
+*.idea/
+*.class
+*.bin
+*.jar
+*.properties
+*.lock
+*.xml
+*.png
+*.plantuml
+*.MF
+gradlew
+gradlew.bat

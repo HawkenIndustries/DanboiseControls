@@ -1,0 +1,112 @@
+/* Module Build File */
+
+description     = "Custom Niagara services and utilities"
+ext {
+}
+niagaraModule {
+  moduleName = "DanboiseControls"
+  preferredSymbol = "dc"
+  runtimeProfile = "se"
+}
+
+dependencies {
+  compile "JohnsonControls:jcin2:14.6.1"
+  compile "Tridium:nre:4.6"
+  compile "Tridium:baja:4.6"
+  compile "Tridium:abstractMqttDriver-rt:1.0"
+  compile "Tridium:abstractMqttDriver-wb:1.0"
+  compile "Tridium:alarm-rt:4.6"
+  compile "Tridium:alarm-se:4.6"
+  compile "Tridium:alarm-ux:4.6"
+  compile "Tridium:alarm-wb:4.6"
+  compile "Tridium:bajaScript-ux:4.6"
+  compile "Tridium:bajaui-wb:4.6"
+  compile "Tridium:bajaux-rt:4.6"
+  compile "Tridium:bajaux-ux:4.6"
+  compile "Tridium:basicDriver-rt:4.6"
+  compile "Tridium:box-rt:4.6"
+  compile "Tridium:bql-rt:4.6"
+  compile "Tridium:bql-ux:4.6"
+  compile "Tridium:control-rt:4.6"
+  compile "Tridium:control-ux:4.6"
+  compile "Tridium:control-wb:4.6"
+  compile "Tridium:dashboard-rt:4.6"
+  compile "Tridium:dashboard-ux:4.6"
+  compile "Tridium:dashboard-wb:4.6"
+  compile "Tridium:driver-rt:4.6"
+  compile "Tridium:driver-ux:4.6"
+  compile "Tridium:driver-wb:4.6"
+  compile "Tridium:email-rt:4.6"
+  compile "Tridium:email-ux:4.6"
+  compile "Tridium:email-wb:4.6"
+  compile "Tridium:entityIo-rt:4.6"
+  compile "Tridium:event-rt:4.6"
+  compile "Tridium:event-wb:4.6"
+  compile "Tridium:file-rt:4.6"
+  compile "Tridium:gx-rt:4.6"
+  compile "Tridium:gx-ux:4.6"
+  compile "Tridium:gx-wb:4.6"
+  compile "Tridium:help-wb:4.6"
+  compile "Tridium:hierarchy-rt:4.6"
+  compile "Tridium:hierarchy-ux:4.6"
+  compile "Tridium:hierarchy-wb:4.6"
+  compile "Tridium:history-rt:4.6"
+  compile "Tridium:history-ux:4.6"
+  compile "Tridium:history-wb:4.6"
+  compile "Tridium:html-wb:4.6"
+  compile "Tridium:hx-wb:4.6"
+  compile "Tridium:migration-rt:4.6"
+  compile "Tridium:migrator-wb:4.6"
+  compile "Tridium:mobile-ux:4.6"
+  compile "Tridium:mobile-wb:4.6"
+  compile "Tridium:mobileThemeZebra-ux:4.6"
+  compile "Tridium:ndriver-rt:4.6"
+  compile "Tridium:ndriver-wb:4.6"
+  compile "Tridium:neql-rt:4.6"
+  compile "Tridium:net-rt:4.6"
+  compile "Tridium:pdf-wb:4.6"
+  compile "Tridium:platSerial-rt:4.6"
+  compile "Tridium:rdb-rt:4.6"
+  compile "Tridium:rdb-wb:4.6"
+  compile "Tridium:report-rt:4.6"
+  compile "Tridium:report-ux:4.6"
+  compile "Tridium:report-wb:4.6"
+  compile "Tridium:saml-rt:4.6"
+  compile "Tridium:saml-wb:4.6"
+  compile "Tridium:schedule-rt:4.6"
+  compile "Tridium:schedule-ux:4.6"
+  compile "Tridium:schedule-wb:4.6"
+  compile "Tridium:search-rt:4.6"
+  compile "Tridium:search-ux:4.6"
+  compile "Tridium:search-wb:4.6"
+  compile "Tridium:serial-rt:4.6"
+  compile "Tridium:serial-wb:4.6"
+  compile "Tridium:seriesTransform-rt:4.6"
+  compile "Tridium:seriesTransform-ux:4.6"
+  compile "Tridium:seriesTransform-wb:4.6"
+  compile "Tridium:sms-rt:4.6"
+  compile "Tridium:sms-wb:4.6"
+  compile "Tridium:snmp-rt:4.6"
+  compile "Tridium:snmp-wb:4.6"
+  compile "Tridium:test-se:4.6"
+  compile "Tridium:test-wb:4.6"
+  compile "Tridium:tls-rt:4.6"
+  compile "Tridium:tls-wb:4.6"
+  compile "Tridium:wbutil-wb:4.6"
+  compile "Tridium:web-rt:4.6"
+  compile "Tridium:webEditors-ux:4.6"
+  compile "Tridium:workbench-wb:4.6"
+  compile project(":DanboiseControls-wb")
+  compile project(":DanboiseControls-ux")
+  compile project(":DanboiseControls-rt")
+}
+
+jar{from('src'){
+  include '/res/icons/*.png'
+  include '/res/icons/*.svg'
+}}
+
+moduleTestJar {
+  from('srcTest') {
+  }
+}
