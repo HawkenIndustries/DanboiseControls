@@ -42,7 +42,7 @@ import java.util.logging.Logger;
         name = "regex",
         type = "baja:String",
         defaultValue = "BString.make(\"^\\\\s{2,}+[A-Z]{2,3}+\\\\s{3,}+\\\\d{1,3}+\\\\s{3,}+.{1,60}\\\\s{3,}[A-Z]*-*[A-Z]*\\\\s{3,}.++\")",
-        flags = Flags.SUMMARY
+        flags = Flags.HIDDEN
 )
 
 @NiagaraProperty(
@@ -65,8 +65,8 @@ import java.util.logging.Logger;
 
 public class BPRNBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder(1706375315)1.0$ @*/
-/* Generated Fri May 31 07:52:44 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder(193225006)1.0$ @*/
+/* Generated Sun Jun 09 21:22:27 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "fileOrd"
@@ -123,7 +123,7 @@ public class BPRNBuilder extends BComponent {
    * @see #getRegex
    * @see #setRegex
    */
-  public static final Property regex = newProperty(Flags.SUMMARY, BString.make("^\\s{2,}+[A-Z]{2,3}+\\s{3,}+\\d{1,3}+\\s{3,}+.{1,60}\\s{3,}[A-Z]*-*[A-Z]*\\s{3,}.++"), null);
+  public static final Property regex = newProperty(Flags.HIDDEN, BString.make("^\\s{2,}+[A-Z]{2,3}+\\s{3,}+\\d{1,3}+\\s{3,}+.{1,60}\\s{3,}[A-Z]*-*[A-Z]*\\s{3,}.++"), null);
   
   /**
    * Get the {@code regex} property.
@@ -216,9 +216,9 @@ public class BPRNBuilder extends BComponent {
                             in.close();
                     }
             }catch(UnresolvedException ue){
-                    logger.severe("PRNBuilder:185 File ORD is unresolved...!!\n"+ue.getCause());
+                    logger.severe("PRNBuilder:219 File ORD is unresolved...!!\n"+ue.getCause());
             }catch(IOException ioe){
-                    logger.severe("PRNBuilder:187 File IO - Unknown file handling exception...!!\n"+ioe.getCause());
+                    logger.severe("PRNBuilder:221 File IO - Unknown file handling exception...!!\n"+ioe.getCause());
             }
     }
 

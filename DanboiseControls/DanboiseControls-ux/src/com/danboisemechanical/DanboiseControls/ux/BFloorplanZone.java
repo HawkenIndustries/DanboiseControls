@@ -36,7 +36,7 @@ public class BFloorplanZone extends BSingleton implements BIJavaScript, BIFormFa
 
 /*+ ------------ END BAJA AUTO GENERATED CODE -------------- +*/
 
-    private static final JsInfo jsInfo = JsInfo.make(BOrd.make("module://DanboiseControls/res/js/FloorplanZone.js"));
+    private static final JsInfo jsInfo = JsInfo.make(BOrd.make("module://DanboiseControls-ux/res/js/FloorplanZone.js"));
 
     @Override
     public JsInfo getJsInfo(Context cx){return jsInfo;}

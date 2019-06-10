@@ -73,7 +73,7 @@ public class PRNParser {
 
     public String filter(String regex, String input){
 
-        Pattern t = Pattern.compile(regex/*"[A-Z]"*/);
+        Pattern t = Pattern.compile(regex);
         StringBuilder sb = new StringBuilder();
         char[] ctp = input.toCharArray();
         for(int i = 0; i < ctp.length; i++){
@@ -110,7 +110,10 @@ public class PRNParser {
                         if(p.matcher(str).matches()){
                             String[] objProps = str.split("\\s{3,}+");
                             String pointType = this.filter("[A-Z]", objProps[0]);
-                            if(objProps.length == 5){
+                            if(objProps.length == 4){
+                                n2Points.add(N2PointDef.make(pointType, Integer.parseInt(objProps[1]), objProps[2], objProps[3], null));
+                            }
+                            else if(objProps.length == 5){
                                 n2Points.add(N2PointDef.make(pointType, Integer.parseInt(objProps[1]), objProps[2], objProps[3], objProps[4]));
                                 job.log().message("PRNParser..."+Arrays.asList(objProps).stream().collect(Collectors.joining(",")));
                             }else if(objProps.length == 6){
