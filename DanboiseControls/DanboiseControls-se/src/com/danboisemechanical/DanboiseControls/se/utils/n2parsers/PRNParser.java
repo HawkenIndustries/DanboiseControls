@@ -86,7 +86,7 @@ public class PRNParser {
             }
         }
         String tp = sb.toString();
-
+        tp.trim();
         return tp;
     }
 

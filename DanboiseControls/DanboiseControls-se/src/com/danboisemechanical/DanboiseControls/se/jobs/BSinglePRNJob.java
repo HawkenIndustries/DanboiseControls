@@ -53,177 +53,210 @@ public class BSinglePRNJob extends BSimpleJob {
 
     BComponent drivers = BOrd.make("slot:/Drivers").resolve(Sys.getStation()).getComponent();
     Arrays.stream(drivers.getChildComponents()).forEach(e -> {
+        if(e.getType().getTypeName().equals("JciN2Network")){
+            BJciN2Network n2 = (BJciN2Network)e;
+            BJciN2ODevice dev = new BJciN2ODevice();
+            String name = "";
 
-      if(e.getType().getTypeName().equals("JciN2Network")){
-        BJciN2Network n2 = (BJciN2Network)e;
-        BJciN2ODevice dev = new BJciN2ODevice();
-        String name = "";
+            try{
+                name = n2Dev.getDevName().replaceAll("\\W\\D", "_");
+                name = name.replaceAll("\\)", "");
+            }catch(IllegalNameException ine){ name = "n2_vnd_dmi"; }
 
-        try{
-          name = n2Dev.getDevName().replaceAll("\\W\\D", "_");
-          name = name.replaceAll("\\)", "");
+            BJciN2OPointDeviceExt devExt = new BJciN2OPointDeviceExt();
+            n2PointList.stream().forEach(i -> {
 
-          BJciN2OPointDeviceExt devExt = new BJciN2OPointDeviceExt();
-          n2PointList.stream().forEach(i -> {
+                String pointType = i.getPointType();
+                String shortName = i.getShortName();
+                String longName = i.getLongName();
+                int pointAddr = i.getPointAddress();
 
-              String pointType = i.getPointType();
-              String shortName = i.getShortName();
-              String longName = i.getLongName();
-              int pointAddr = i.getPointAddress();
+                try{
 
-            if(i.getPointType().equals("AI")){
+                    if(i.getPointType().equals("AI")){
 
-              BNumericPoint np = new BNumericPoint();
-              BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
-              String pointName = i.getShortName().replaceAll("-", "_");
-              proxyExt.set("networkPointType", BJciN2ObjectType.analogInput);
-              proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
-              proxyExt.set("shortName", BString.make(pointName));
-              proxyExt.set("longName", BString.make(i.getLongName()));
-              np.setProxyExt(proxyExt);
-              if(i.getPointUnits().equals("%RH")){
-                np.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent relative humidity"), 0));
-              }else if(i.getPointUnits().equals("deg F") || i.getPointUnits().contains("F delta")){
-                np.setFacets(BFacets.makeNumeric(BUnit.getUnit("fahrenheit"), 1));
-              }else if(i.getPointUnits().equals("in WC")){
-                np.setFacets(BFacets.makeNumeric(BUnit.getUnit("inches of water"), 3));
-              }else if(i.getPointUnits().equals("psi")){
-                np.setFacets(BFacets.makeNumeric(BUnit.getUnit("pounds per square inch"), 1));
-              }else if(i.getPointUnits().equals("ppm")){
-                  np.setFacets(BFacets.makeNumeric(BUnit.getUnit("parts per million"),0));
-              }else if(i.getPointUnits().equals("min")){
-                  np.setFacets(BFacets.makeNumeric(BUnit.getUnit("minute"),0));
-              }else if(i.getPointUnits().equals("%")){
-                  np.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent"), 0));
-              }
-              else{
-                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:101");
-              }
+                        BNumericPoint np = new BNumericPoint();
+                        BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
+                        String pointName = i.getShortName().replaceAll("-", "_");
+                        proxyExt.set("networkPointType", BJciN2ObjectType.analogInput);
+                        proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
+                        proxyExt.set("shortName", BString.make(pointName));
+                        proxyExt.set("longName", BString.make(i.getLongName()));
+                        np.setProxyExt(proxyExt);
+                        if(i.getPointUnits().equals("%RH")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent relative humidity"), 0));
+                        }else if(i.getPointUnits().equals("deg F") || i.getPointUnits().contains("F delta")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("fahrenheit"), 1));
+                        }else if(i.getPointUnits().equals("in wc")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("inches of water"), 3));
+                        }else if(i.getPointUnits().equals("psi")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("pounds per square inch"), 1));
+                        }else if(i.getPointUnits().equals("ppm")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("parts per million"),0));
+                        }else if(i.getPointUnits().equals("min")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("minute"),0));
+                        }else if(i.getPointUnits().equals("%")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent"), 0));
+                        }
+                        else{
+                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:101");
+                        }
 
-              devExt.add(pointName, np);
-              devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
-              log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
-//
-          }else if(i.getPointType().equals("AO") || i.getPointType().equals("ADF") ||
-                    (i.getPointType().equals("ADI") && i.getPointUnits().equals("min"))){
+                        devExt.add(pointName, np);
+                        devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
 
-              BNumericWritable nw = new BNumericWritable();
-              BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
-              String pointName = i.getShortName().replaceAll("-", "_");
-                if(i.getPointType().equals("AO")){
-                    proxyExt.set("networkPointType", BJciN2ObjectType.analogOutput);
-                }else if( i.getPointType().equals("ADI")){
-                    proxyExt.set("networkPointType", BJciN2ObjectType.analogDataInteger);
-                }else{
-                    proxyExt.set("networkPointType", BJciN2ObjectType.analogDataFloat);
+                    }else if(i.getPointType().equals("AO") || i.getPointType().equals("ADF") ||
+                            (i.getPointType().equals("ADI") && i.getPointUnits().equals("min")) ||
+                            i.getPointType().equals("ADI") && i.getPointUnits().equals("ft")){
+
+
+                        BNumericWritable nw = new BNumericWritable();
+                        BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
+                        String pointName = i.getShortName();
+                        if(i.getShortName().contains("-") ) pointName = pointName.replaceAll("-", "_");
+                        try{
+                            int n = Integer.parseInt(pointName.substring(0,1));
+                            pointName = pointName.substring(1)+ "_".concat(String.valueOf(n));
+
+                        }catch(Exception ex){}
+
+                        if(i.getPointType().equals("AO")){
+                            proxyExt.set("networkPointType", BJciN2ObjectType.analogOutput);
+                        }else if( i.getPointType().equals("ADI")){
+                            proxyExt.set("networkPointType", BJciN2ObjectType.analogDataInteger);
+                        }else{
+                            proxyExt.set("networkPointType", BJciN2ObjectType.analogDataFloat);
+                        }
+                        proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
+                        proxyExt.set("shortName", BString.make(pointName));
+                        proxyExt.set("longName", BString.make(i.getLongName()));
+                        nw.setProxyExt(proxyExt);
+                        try{
+                            if(i.getPointUnits().equals("%")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent"),0));
+                            }else if(i.getPointUnits().equals("%RH")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent relative humidity"), 0));
+                            }else if(i.getPointUnits().equals("deg F") || i.getPointUnits().contains("F delta")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("fahrenheit"), 1));
+                            }else if(i.getPointUnits().equals("in wc")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("inches of water"), 3));
+                            }else if(i.getPointUnits().equals("psi")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("pounds per square inch"), 1));
+                            }else if(i.getPointUnits().equals("ppm")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("parts per million"),0));
+                            }else if(i.getPointUnits().equals("min")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("minute"),0));
+                            }else if(i.getPointUnits().equals("ft")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("foot"), 0));
+                            }
+                            else{
+                                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:158");
+                            }
+                        }catch(NullPointerException npe){}
+
+                        devExt.add(pointName, nw);
+                        devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
+                        log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
+
+                    }else if(i.getPointType().equals("BI")){
+
+                        BBooleanPoint bp = new BBooleanPoint();
+                        BJciN2OBooleanProxyExt proxyExt = new BJciN2OBooleanProxyExt();
+                        String pointName = i.getShortName().replaceAll("-", "_");
+                        proxyExt.set("networkPointType", BJciN2ObjectType.binaryInput);
+                        proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
+                        proxyExt.set("shortName", BString.make(pointName));
+                        proxyExt.set("longName", BString.make(i.getLongName()));
+                        bp.setProxyExt(proxyExt);
+                        if(i.getPointUnits().equals("Off/On")){
+                            bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("On"),
+                                    BFacets.FALSE_TEXT, BString.make("Off")));
+                        }else if(i.getPointUnits().equals("Normal/Alarm")){
+                            bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("Alarm"),
+                                    BFacets.FALSE_TEXT, BString.make("Normal")));
+                        }else{
+                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:188");
+                        }
+
+                        devExt.add(pointName, bp);
+                        devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
+                        log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
+
+                    }else if(i.getPointType().equals("BO")){
+
+                        BBooleanWritable bp = new BBooleanWritable();
+                        BJciN2OBooleanProxyExt proxyExt = new BJciN2OBooleanProxyExt();
+                        String pointName = i.getShortName().replaceAll("-", "_");
+                        proxyExt.set("networkPointType", BJciN2ObjectType.binaryOutput);
+                        proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
+                        proxyExt.set("shortName", BString.make(pointName));
+                        proxyExt.set("longName", BString.make(i.getLongName()));
+                        bp.setProxyExt(proxyExt);
+                        if(i.getPointUnits().equals("Off/On")){
+                            bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("On"),
+                                    BFacets.FALSE_TEXT, BString.make("Off")));
+                        }else{
+                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:214");
+                        }
+
+                        devExt.add(pointName, bp);
+                        devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
+                        log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
+
+                    }else if(i.getPointType().equals("ADI") && (!i.getPointUnits().equals("min"))){
+
+                        BEnumWritable ew = new BEnumWritable();
+                        BJciN2OEnumProxyExt proxyExt = new BJciN2OEnumProxyExt();
+                        String pointName = i.getShortName().replaceAll("-", "_");
+                        proxyExt.set("networkPointType", BJciN2ObjectType.analogDataInteger);
+                        proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
+                        proxyExt.set("shortName", BString.make(pointName));
+                        proxyExt.set("longName", BString.make(i.getLongName()));
+                        try{
+                            if(i.getPointUnits().contains("/")){
+                                String[] units = i.getPointUnits().split("/");
+                                for(int it = 0; it < units.length; it++){
+                                    prn.filter("[A-Z]", units[it]);
+                                }
+                                BEnumRange range = BEnumRange.make(units);
+                                BDynamicEnum dyEnum = BDynamicEnum.make(units.length, range);
+                                ew.set(dyEnum);
+                            }else{
+                                logger.warning("[WARNING] Enum point not added due to lack of state defs!!!\t"+
+                                        i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress());
+                                log().message("[WARNING] Enum point not added due to lack of state defs!!!\t"+
+                                        i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress());
+                            }
+                        }catch(NullPointerException npe){
+
+                        }catch(IllegalNameException ine){
+                            logger.severe("[ERROR] BSinglePRNJob.java:253 -- IllegalNameException ADI - ENUMS...!!!\t"+
+                                    i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress()+"\n"+ine.getStackTrace().toString());
+                            log().message("[ERROR] BSinglePRNJob.java:255 -- IllegalNameException ADI - ENUMS...!!!\t"+
+                                    i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress()+"\n");
+                        }
+
+                    }else{ logger.warning("[WARNING] point type parsed from prn file not matched!!...BSinglePRNJob.java:264"
+                            .concat("\n".concat(i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress())));
+                    }
+                }catch(Exception catchAll){
+                    logger.severe("[ERROR] BSinglePRNJob.java:254 -- CATCH ALL...!!!\n"+ catchAll.getStackTrace().toString());
+                    log().message("[ERROR] BSinglePRNJob.java:167-- CATCH ALL EXCEPTION HANDLER...!!!\n"+
+                            i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress()+
+                            catchAll.getStackTrace().toString());
                 }
-              proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
-              proxyExt.set("shortName", BString.make(pointName));
-              proxyExt.set("longName", BString.make(i.getLongName()));
-              nw.setProxyExt(proxyExt);
-              if(i.getPointUnits().equals("%")){
-                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent"),0));
-              }else if(i.getPointUnits().equals("%RH")){
-                  nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent relative humidity"), 0));
-              }else if(i.getPointUnits().equals("deg F") || i.getPointUnits().contains("F delta")){
-                  nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("fahrenheit"), 1));
-              }else if(i.getPointUnits().equals("in WC")){
-                  nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("inches of water"), 3));
-              }else if(i.getPointUnits().equals("psi")){
-                  nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("pounds per square inch"), 1));
-              }else if(i.getPointUnits().equals("ppm")){
-                  nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("parts per million"),0));
-              }else if(i.getPointUnits().equals("min")){
-                  nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("minute"),0));
-              }
-              else{
-                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:141");
-              }
+            });
 
-              devExt.add(pointName, nw);
-              devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
-              log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
+            dev.setPoints(devExt);
+            log().message(devExt.getPropertiesArray().toString());
+            n2.add(name, dev);
 
-          }else if(i.getPointType().equals("BI")){
-
-              BBooleanPoint bp = new BBooleanPoint();
-              BJciN2OBooleanProxyExt proxyExt = new BJciN2OBooleanProxyExt();
-              String pointName = i.getShortName().replaceAll("-", "_");
-              proxyExt.set("networkPointType", BJciN2ObjectType.binaryInput);
-              proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
-              proxyExt.set("shortName", BString.make(pointName));
-              proxyExt.set("longName", BString.make(i.getLongName()));
-              bp.setProxyExt(proxyExt);
-              if(i.getPointUnits().equals("Off/On")){
-                bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("On"),
-                        BFacets.FALSE_TEXT, BString.make("Off")));
-              }else if(i.getPointUnits().equals("Normal/Alarm")){
-                bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("Alarm"),
-                        BFacets.FALSE_TEXT, BString.make("Normal")));
-              }else{
-                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:165");
-              }
-
-              devExt.add(pointName, bp);
-              devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
-              log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
-
-            }else if(i.getPointType().equals("BO")){
-
-              BBooleanWritable bp = new BBooleanWritable();
-              BJciN2OBooleanProxyExt proxyExt = new BJciN2OBooleanProxyExt();
-              String pointName = i.getShortName().replaceAll("-", "_");
-              proxyExt.set("networkPointType", BJciN2ObjectType.binaryOutput);
-              proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
-              proxyExt.set("shortName", BString.make(pointName));
-              proxyExt.set("longName", BString.make(i.getLongName()));
-              bp.setProxyExt(proxyExt);
-              if(i.getPointUnits().equals("Off/On")){
-                bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("On"),
-                        BFacets.FALSE_TEXT, BString.make("Off")));
-              }else{
-                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:186");
-              }
-
-              devExt.add(pointName, bp);
-              devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
-              log().message("SinglePRNJob..."+i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress());
-
-            }else if(i.getPointType().equals("ADI") && (!i.getPointUnits().equals("min"))){
-
-                BEnumWritable ew = new BEnumWritable();
-                BJciN2OEnumProxyExt proxyExt = new BJciN2OEnumProxyExt();
-                String pointName = i.getShortName().replaceAll("-", "_");
-                proxyExt.set("networkPointType", BJciN2ObjectType.analogDataInteger);
-                proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
-                proxyExt.set("shortName", BString.make(pointName));
-                proxyExt.set("longName", BString.make(i.getLongName()));
-                if(i.getPointUnits().contains("/")){
-                    String[] units = i.getPointUnits().split("/");
-                    BEnumRange range = BEnumRange.make(units);
-                    BDynamicEnum dyEnum = BDynamicEnum.make(units.length, range);
-                    ew.set(dyEnum);
-                }else{}
-
-            }else{ logger.warning("[WARNING] point type parsed from prn file not matched!!...BSinglePRNJob.java:209"); }
-          });
-
-          dev.setPoints(devExt);
-          log().message(devExt.getPropertiesArray().toString());
-          n2.add(name, dev);
-
-        }catch(IllegalNameException ine){
-          name = "n2_vnd_dmi";
-          n2.add(name, new BJciN2ODevice());
-
+            this.log().message(e.getType().getTypeName() + " FOUND... - BSinglePRNJob.java:272");
+            this.log().message(n2Dev.getDevName()+" parsed from prn file...");
+            this.log().message(name+" parsed name");
+        }else{
+            this.log().message("JciN2Network NOT FOUND ... while attempting to add n2 device from PRN file...!!! - BSinglePRNJob.java:276");
         }
-
-        this.log().message(e.getType().getTypeName() + " FOUND... - BSinglePRNJob.java:222");
-        this.log().message(n2Dev.getDevName()+" parsed from prn file...");
-        this.log().message(name+" parsed name");
-      }else{
-        this.log().message("JciN2Network NOT FOUND ... while attempting to add n2 device from PRN file...!!! - BSinglePRNJob.java:226");
-      }
     });
 
   }

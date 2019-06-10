@@ -23,7 +23,9 @@ public class N2PointDef {
         pointDefObj.pointAddress = address;
         pointDefObj.longName = lName;
         pointDefObj.shortName = sName;
-        pointDefObj.pointUnits = u;
+        try{
+            pointDefObj.pointUnits = u;
+        }catch(NullPointerException npe){}
 
         return pointDefObj;
     }
