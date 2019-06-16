@@ -16,9 +16,39 @@ public class BQLResolver {
      * @return ArrayList<BObject>: Return an array-list of resolved BObjects to the caller.
      */
 
-    public ArrayList<BObject> resolve(BString type, BString stationPath){
+    public ArrayList<BObject> resolveType(BString type, BString stationPath){
         ArrayList<BObject> objRefs = new ArrayList<>();
         BOrd ord =  BOrd.make(stationPath.getString().concat("|bql:select name from control:ControlPoint where type = "+type));
+        BITable<BObject> t = (BITable)ord.resolve(Sys.getStation()).get();
+        TableCursor<BObject> c = t.cursor();
+        while(c.next()){
+            try{
+                objRefs.add(c.get());
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return objRefs;
+    }
+
+    public ArrayList<BObject> resolveName(BString name, BString stationPath){
+        ArrayList<BObject> objRefs = new ArrayList<>();
+        BOrd ord =  BOrd.make(stationPath.getString().concat("|bql:select name from control:ControlPoint where name like "+"*"+name+"*"));
+        BITable<BObject> t = (BITable)ord.resolve(Sys.getStation()).get();
+        TableCursor<BObject> c = t.cursor();
+        while(c.next()){
+            try{
+                objRefs.add(c.get());
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return objRefs;
+    }
+
+    public ArrayList<BObject> resolveSlotPath(BString slotPath, BString stationPath){
+        ArrayList<BObject> objRefs = new ArrayList<>();
+        BOrd ord =  BOrd.make(stationPath.getString().concat("|bql:select name from control:ControlPoint where name like "+"*"+slotPath+"*"));
         BITable<BObject> t = (BITable)ord.resolve(Sys.getStation()).get();
         TableCursor<BObject> c = t.cursor();
         while(c.next()){

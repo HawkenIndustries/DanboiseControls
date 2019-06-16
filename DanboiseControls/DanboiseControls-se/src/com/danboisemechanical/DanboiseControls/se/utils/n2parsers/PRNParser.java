@@ -34,24 +34,15 @@ public class PRNParser {
                 BufferedReader bin = new BufferedReader(in);
                 String str;
                 while((str = bin.readLine()) != null){
-                    if(str.startsWith("   Configuration Date   : ")){
-                        props[0] = str.substring("   Configuration Date   : ".length());
+                    if(str.contains("Device Group         : ")){
+                        props[0] = str.split(":")[1].replaceAll(" ", "").trim();
                         breakCnt = 0;
-                    }else if(str.startsWith("   Engineering Units    : ")){
-                        props[1] = str.substring("   Engineering Units    : ".length());
-                        breakCnt = 0;
-                    }else if(str.startsWith("   Device Group         : ")){
-                        props[2] = str.substring("   Device Group         : ".length());
-                        breakCnt = 0;
-                    }else if(str.startsWith("   Device Name          : ")){
-                        props[3] = str.substring("   Device Name          : ".length());
-                        breakCnt = 0;
-                    }else if(str.startsWith("   Application Name     : ")){
-                        props[4] = str.substring("   Application Name     : ".length());
+                    }else if(str.contains("Device Name")){
+                        props[1] = str.split(":")[1].replaceAll(" ", "").trim();
                         breakCnt = 0;
                     }else{
                         breakCnt++;
-                        if(breakCnt >= 10) break;
+                        if(breakCnt >= 30) break;
                     }
                 }
             }finally{in.close();}
@@ -61,14 +52,11 @@ public class PRNParser {
             logger.severe("File IO - Unknown file exception while trying to open the file from the ord specified...!!\n"
                     +ioe.getCause());
         }
-        job.log().message("PRNParser..."+props[0]);
-        job.log().message("PRNParser..."+props[1]);
-        job.log().message("PRNParser..."+props[2]);
-        job.log().message("PRNParser..."+props[3]);
-        job.log().message("PRNParser..."+props[4]);
+        job.log().message("Device Group..."+props[0]);
+        job.log().message("Device Name..."+props[1]);
         job.log().message(" ********************************** ");
 
-        return N2DevDef.make(props[0], props[1], props[2], props[3], props[4]);
+        return N2DevDef.make(props[0], props[1]);
     }
 
     public String filter(String regex, String input){
@@ -82,7 +70,7 @@ public class PRNParser {
             if(t.matcher(s).matches()){
                 sb.append(s);
             }else{
-                logger.warning("PRNParser:85...ERROR matching...!!!");
+                logger.warning("PRNParser:90...ERROR matching...!!!");
             }
         }
         String tp = sb.toString();

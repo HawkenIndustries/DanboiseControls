@@ -17,4 +17,8 @@
   <type class="com.danboisemechanical.DanboiseControls.se.models.enums.BAlarmTypeEnum" name="AlarmTypeEnum"/>
   <!--com.danboisemechanical.DanboiseControls.se.builders-->
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder" name="PRNBuilder"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder" name="TagBuilder"/>
+  <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRulesules-->
+  <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRules-->
+  <type class="com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule" name="TagRule"/>
 </types>

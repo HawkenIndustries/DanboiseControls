@@ -1,6 +1,7 @@
 package com.danboisemechanical.DanboiseControls.se.services;
 
 import com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder;
+import com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder;
 
 import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
@@ -15,14 +16,19 @@ import java.util.logging.Logger;
         defaultValue = "BPRNBuilder.make()",
         flags = Flags.SUMMARY
 )
-
+@NiagaraProperty(
+        name = "TagBuilder",
+        type = "DanboiseControls:TagBuilder",
+        defaultValue = "BTagBuilder.make()",
+        flags = Flags.SUMMARY
+)
 
 @NiagaraType
 
 public class BSysBuilderService extends BAbstractService {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService(3514410439)1.0$ @*/
-/* Generated Wed May 22 21:48:28 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService(3273597476)1.0$ @*/
+/* Generated Sat Jun 15 08:54:13 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "PRNBuilder"
@@ -46,6 +52,29 @@ public class BSysBuilderService extends BAbstractService {
    * @see #PRNBuilder
    */
   public void setPRNBuilder(BPRNBuilder v) { set(PRNBuilder, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "TagBuilder"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code TagBuilder} property.
+   * @see #getTagBuilder
+   * @see #setTagBuilder
+   */
+  public static final Property TagBuilder = newProperty(Flags.SUMMARY, BTagBuilder.make(), null);
+  
+  /**
+   * Get the {@code TagBuilder} property.
+   * @see #TagBuilder
+   */
+  public BTagBuilder getTagBuilder() { return (BTagBuilder)get(TagBuilder); }
+  
+  /**
+   * Set the {@code TagBuilder} property.
+   * @see #TagBuilder
+   */
+  public void setTagBuilder(BTagBuilder v) { set(TagBuilder, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Type

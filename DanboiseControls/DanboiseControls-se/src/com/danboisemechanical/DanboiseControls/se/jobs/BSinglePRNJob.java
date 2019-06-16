@@ -4,7 +4,6 @@ import com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder;
 import com.danboisemechanical.DanboiseControls.se.models.n2.N2DevDef;
 import com.danboisemechanical.DanboiseControls.se.models.n2.N2PointDef;
 import com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService;
-import com.danboisemechanical.DanboiseControls.se.utils.general.BQLResolver;
 import com.danboisemechanical.DanboiseControls.se.utils.n2parsers.PRNParser;
 
 import com.jci.jcin2.BJciN2Network;
@@ -46,6 +45,7 @@ public class BSinglePRNJob extends BSimpleJob {
   //PARENT METHOD OVERRIDES
   @Override
   public void run(Context cx) throws Exception{
+
     BPRNBuilder builder = ((BSysBuilderService)Sys.getService(BSysBuilderService.TYPE)).getPRNBuilder();
 
     n2Dev = prn.parseN2Dev(builder.getFileOrd(), builder, this);
@@ -58,10 +58,7 @@ public class BSinglePRNJob extends BSimpleJob {
             BJciN2ODevice dev = new BJciN2ODevice();
             String name = "";
 
-            try{
-                name = n2Dev.getDevName().replaceAll("\\W\\D", "_");
-                name = name.replaceAll("\\)", "");
-            }catch(IllegalNameException ine){ name = "n2_vnd_dmi"; }
+            name = n2Dev.getDevName().replaceAll("[^A-Za-b0-9]", "");
 
             BJciN2OPointDeviceExt devExt = new BJciN2OPointDeviceExt();
             n2PointList.stream().forEach(i -> {
@@ -249,7 +246,10 @@ public class BSinglePRNJob extends BSimpleJob {
 
             dev.setPoints(devExt);
             log().message(devExt.getPropertiesArray().toString());
-            n2.add(name, dev);
+
+            try{
+                n2.add(name, dev);
+            }catch(IllegalNameException ine){ n2.add("dmi_n2Device", dev); }
 
             this.log().message(e.getType().getTypeName() + " FOUND... - BSinglePRNJob.java:272");
             this.log().message(n2Dev.getDevName()+" parsed from prn file...");

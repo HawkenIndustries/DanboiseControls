@@ -15,6 +15,7 @@ import javax.baja.status.BStatusValue;
 import javax.baja.sys.*;
 import javax.baja.units.BUnit;
 import javax.baja.util.BFormat;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
 
