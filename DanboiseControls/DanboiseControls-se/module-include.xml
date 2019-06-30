@@ -21,4 +21,7 @@
   <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRulesules-->
   <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRules-->
   <type class="com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule" name="TagRule"/>
+  <!--com.danboisemechanical.DanboiseControls.se.models.alarms-->
+  <type class="com.danboisemechanical.DanboiseControls.se.models.alarms.BAbstractAlarmType" name="AbstractAlarmType"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.alarms.BFireAlm" name="FireAlm"/>
 </types>

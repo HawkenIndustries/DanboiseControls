@@ -13,7 +13,13 @@ import javax.baja.sys.*;
         flags = Flags.SUMMARY
 )
 @NiagaraProperty(
-        name = "PointNameHint",
+        name = "NiagaraType",
+        type = "baja:String",
+        defaultValue = "BString.make(\"\")",
+        flags = Flags.SUMMARY
+)
+@NiagaraProperty(
+        name = "PointNames",
         type = "baja:String",
         defaultValue = "BString.make(\"\")",
         flags = Flags.SUMMARY
@@ -21,8 +27,8 @@ import javax.baja.sys.*;
 
 public class BTagRule extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule(3256581577)1.0$ @*/
-/* Generated Wed Jun 12 17:37:10 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule(2407661259)1.0$ @*/
+/* Generated Wed Jun 26 09:43:01 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "TargetId"
@@ -48,27 +54,50 @@ public class BTagRule extends BComponent {
   public void setTargetId(String v) { setString(TargetId, v, null); }
 
 ////////////////////////////////////////////////////////////////
-// Property "PointNameHint"
+// Property "NiagaraType"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code PointNameHint} property.
-   * @see #getPointNameHint
-   * @see #setPointNameHint
+   * Slot for the {@code NiagaraType} property.
+   * @see #getNiagaraType
+   * @see #setNiagaraType
    */
-  public static final Property PointNameHint = newProperty(Flags.SUMMARY, BString.make(""), null);
+  public static final Property NiagaraType = newProperty(Flags.SUMMARY, BString.make(""), null);
   
   /**
-   * Get the {@code PointNameHint} property.
-   * @see #PointNameHint
+   * Get the {@code NiagaraType} property.
+   * @see #NiagaraType
    */
-  public String getPointNameHint() { return getString(PointNameHint); }
+  public String getNiagaraType() { return getString(NiagaraType); }
   
   /**
-   * Set the {@code PointNameHint} property.
-   * @see #PointNameHint
+   * Set the {@code NiagaraType} property.
+   * @see #NiagaraType
    */
-  public void setPointNameHint(String v) { setString(PointNameHint, v, null); }
+  public void setNiagaraType(String v) { setString(NiagaraType, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "PointNames"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code PointNames} property.
+   * @see #getPointNames
+   * @see #setPointNames
+   */
+  public static final Property PointNames = newProperty(Flags.SUMMARY, BString.make(""), null);
+  
+  /**
+   * Get the {@code PointNames} property.
+   * @see #PointNames
+   */
+  public String getPointNames() { return getString(PointNames); }
+  
+  /**
+   * Set the {@code PointNames} property.
+   * @see #PointNames
+   */
+  public void setPointNames(String v) { setString(PointNames, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Type

@@ -591,6 +591,7 @@ public class BSetpointErrorAlgorithm extends BOffnormalAlgorithm {
     return this.current.evaluate(presentValue, toAlarmTimeDelay, toNormalTimeDelay);
   }
 
+  @SuppressWarnings("unchecked")
   public void writeAlarmData(BStatusValue out, Map map) {
     BFacets facets = this.getPointFacets();
     map.put("status", BString.make(out.getStatus().toString((Context)null)));

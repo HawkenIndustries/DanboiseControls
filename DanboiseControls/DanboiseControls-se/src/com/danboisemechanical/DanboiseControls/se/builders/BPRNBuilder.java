@@ -32,13 +32,6 @@ import java.util.logging.Logger;
 )
 
 @NiagaraProperty(
-        name = "numberOfDevices",
-        type = "baja:Integer",
-        defaultValue = "BInteger.make(0)",
-        flags = Flags.HIDDEN | Flags.DEFAULT_ON_CLONE
-)
-
-@NiagaraProperty(
         name = "regex",
         type = "baja:String",
         defaultValue = "BString.make(\"^\\\\s{2,}+[A-Z]{2,3}+\\\\s{3,}+\\\\d{1,3}+\\\\s{3,}+.{1,60}\\\\s{3,}[A-Z]*-*[A-Z]*\\\\s{3,}.++\")",
@@ -53,7 +46,7 @@ import java.util.logging.Logger;
 )
 
 @NiagaraAction(
-        name = "buildSinglePrn"
+        name = "buildFromPrn"
 )
 
 @NiagaraAction(
@@ -65,8 +58,8 @@ import java.util.logging.Logger;
 
 public class BPRNBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder(193225006)1.0$ @*/
-/* Generated Sun Jun 09 21:22:27 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder(3591642000)1.0$ @*/
+/* Generated Fri Jun 28 08:58:51 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "fileOrd"
@@ -90,29 +83,6 @@ public class BPRNBuilder extends BComponent {
    * @see #fileOrd
    */
   public void setFileOrd(BOrd v) { set(fileOrd, v, null); }
-
-////////////////////////////////////////////////////////////////
-// Property "numberOfDevices"
-////////////////////////////////////////////////////////////////
-  
-  /**
-   * Slot for the {@code numberOfDevices} property.
-   * @see #getNumberOfDevices
-   * @see #setNumberOfDevices
-   */
-  public static final Property numberOfDevices = newProperty(Flags.HIDDEN | Flags.DEFAULT_ON_CLONE, ((BInteger)(BInteger.make(0))).getInt(), null);
-  
-  /**
-   * Get the {@code numberOfDevices} property.
-   * @see #numberOfDevices
-   */
-  public int getNumberOfDevices() { return getInt(numberOfDevices); }
-  
-  /**
-   * Set the {@code numberOfDevices} property.
-   * @see #numberOfDevices
-   */
-  public void setNumberOfDevices(int v) { setInt(numberOfDevices, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "regex"
@@ -161,20 +131,20 @@ public class BPRNBuilder extends BComponent {
   public void setSysWorker(BSysBuilderWorker v) { set(sysWorker, v, null); }
 
 ////////////////////////////////////////////////////////////////
-// Action "buildSinglePrn"
+// Action "buildFromPrn"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code buildSinglePrn} action.
-   * @see #buildSinglePrn()
+   * Slot for the {@code buildFromPrn} action.
+   * @see #buildFromPrn()
    */
-  public static final Action buildSinglePrn = newAction(0, null);
+  public static final Action buildFromPrn = newAction(0, null);
   
   /**
-   * Invoke the {@code buildSinglePrn} action.
-   * @see #buildSinglePrn
+   * Invoke the {@code buildFromPrn} action.
+   * @see #buildFromPrn
    */
-  public void buildSinglePrn() { invoke(buildSinglePrn, null, null); }
+  public void buildFromPrn() { invoke(buildFromPrn, null, null); }
 
 ////////////////////////////////////////////////////////////////
 // Action "dumpPrn"
@@ -223,7 +193,7 @@ public class BPRNBuilder extends BComponent {
     }
 
     //ACTION CALLBACKS
-    public void doBuildSinglePrn(Context cx){
+    public void doBuildFromPrn(Context cx){
             BJobService.getService().submit(new BSinglePRNJob(), cx);
     }
 

@@ -7,6 +7,7 @@ niagaraModule {
   moduleName = "DanboiseControls"
   preferredSymbol = "dc"
   runtimeProfile = "se"
+  certAlias = "dc-code-cert"
 }
 
 dependencies {
@@ -99,6 +100,8 @@ dependencies {
   compile project(":DanboiseControls-wb")
   compile project(":DanboiseControls-ux")
   compile project(":DanboiseControls-rt")
+  
+  uberjar 'com.google.code.gson:gson:2.8.5'
 }
 
 jar{from('src'){
