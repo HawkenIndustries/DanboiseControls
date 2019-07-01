@@ -193,7 +193,7 @@ public class BPRNBuilder extends BComponent {
     }
 
     //ACTION CALLBACKS
-    public void doBuilFromPrn(Context cx){
+    public void doBuildFromPrn(Context cx){
             BJobService.getService().submit(new BSinglePRNJob(), cx);
     }
 

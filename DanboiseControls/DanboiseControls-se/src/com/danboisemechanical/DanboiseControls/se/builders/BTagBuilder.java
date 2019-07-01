@@ -35,7 +35,7 @@ import java.util.stream.Stream;
         name = "BqlQuery",
         type = "baja:String",
         defaultValue = "BString.make(\"\")",
-        flags = Flags.SUMMARY
+        flags = Flags.SUMMARY | Flags.READONLY
 )
 @NiagaraProperty(
         name = "TagRulesOrd",
@@ -339,19 +339,20 @@ public class BTagBuilder extends BComponent {
     public void doBuildAll(){
         try{
             BQLResolver resolver = new BQLResolver();
-            ArrayList<BComponent> queryObjects = resolver.resolve(BString.make(getBqlQuery()));
+//            ArrayList<BComponent> queryObjects = resolver.resolve(BString.make(getBqlQuery()));
+            ArrayList<BComponent> queryObjects = null;
 
             //TODO: Check the Rules json array to see if it has rules, if it does loop through all the points adding tags as per the rules.
 
             AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
-//                JsonArray rules = RulesDoc.getAsJsonArray("rules");
-//                for(JsonElement rule: rules){ logger.info(gson.toJson(rule)); }
+                JsonArray rules = RulesDoc.getAsJsonArray("rules");
+                for(JsonElement rule: rules){ logger.info(gson.toJson(rule)); }
                 return null;
             });
 
-            for (BComponent obj : queryObjects) {
-                logger.info(obj.getName());
-            }
+//            for (BComponent obj : queryObjects) {
+//                logger.info(obj.getName());
+//            }
 
         }catch(Exception e){
             logger.severe(e.getMessage());
