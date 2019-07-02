@@ -451,7 +451,7 @@ public class BTagBuilder extends BComponent {
 
                         }catch(UnresolvedException ue){logger.severe(ue.getMessage()); ue.printStackTrace();}
                     }else{
-                        logger.warning("ERROR - Rule is not a valid JSON object..!");
+                        logger.warning("ERROR - Rule is not a valid JSON object...!");
                     }
                 });
                 return null;
