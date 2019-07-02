@@ -211,7 +211,7 @@ public class BPRNBuilder extends BComponent {
 
     //PRIVATE FIELDS
     private ArrayList<String> prnLines = new ArrayList<>();
-    private static Logger logger = Logger.getLogger("DMI_PRNBuilder");
+    private static Logger logger = Logger.getLogger("DMI_SysBuilder_PRNBuilder");
     private static Type[] serviceTypes = new Type[]{TYPE};
 
     //CLASS METHODS

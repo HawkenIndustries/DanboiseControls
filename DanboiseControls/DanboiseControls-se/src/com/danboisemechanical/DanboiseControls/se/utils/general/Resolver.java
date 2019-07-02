@@ -9,7 +9,7 @@ import javax.baja.sys.BString;
 import javax.baja.sys.Sys;
 import java.util.ArrayList;
 
-public class BQLResolver {
+public class Resolver {
     /***
      * resolve a slot path and a type into a qualified bql query, and return the list of BObject references.
      * @param type: Niagara type to use in the bql query.

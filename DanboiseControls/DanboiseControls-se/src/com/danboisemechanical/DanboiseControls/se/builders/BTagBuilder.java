@@ -1,7 +1,7 @@
 package com.danboisemechanical.DanboiseControls.se.builders;
 
 import com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule;
-import com.danboisemechanical.DanboiseControls.se.utils.general.BQLResolver;
+import com.danboisemechanical.DanboiseControls.se.utils.general.Resolver;
 import com.danboisemechanical.DanboiseControls.se.workers.BSysBuilderWorker;
 
 import com.google.gson.*;
@@ -27,28 +27,19 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 @NiagaraType
 
 @NiagaraProperty(
-        name = "BqlQuery",
-        type = "baja:String",
-        defaultValue = "BString.make(\"\")",
-        flags = Flags.SUMMARY | Flags.READONLY
+        name = "QueryPath",
+        type = "baja:Ord",
+        defaultValue = "BOrd.make(\"\")",
+        flags = Flags.SUMMARY
 )
 @NiagaraProperty(
         name = "TagRulesOrd",
         type = "baja:Ord",
         defaultValue = "BOrd.make(\"file:^sysBuilder/TagRules.json\")",
-        facets = {
-                @Facet(name = "BFacets.TARGET_TYPE", value = "\"baja:IFile\"")
-        }
-)
-@NiagaraProperty(
-        name = "RelRulesOrd",
-        type = "baja:Ord",
-        defaultValue = "BOrd.make(\"file:^sysBuilder/RelRules.json\")",
         facets = {
                 @Facet(name = "BFacets.TARGET_TYPE", value = "\"baja:IFile\"")
         }
@@ -85,31 +76,31 @@ import java.util.stream.Stream;
 
 public class BTagBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(3053446803)1.0$ @*/
-/* Generated Sun Jun 30 13:39:21 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(799414114)1.0$ @*/
+/* Generated Mon Jul 01 15:18:40 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
-// Property "BqlQuery"
+// Property "QueryPath"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code BqlQuery} property.
-   * @see #getBqlQuery
-   * @see #setBqlQuery
+   * Slot for the {@code QueryPath} property.
+   * @see #getQueryPath
+   * @see #setQueryPath
    */
-  public static final Property BqlQuery = newProperty(Flags.SUMMARY, BString.make(""), null);
+  public static final Property QueryPath = newProperty(Flags.SUMMARY, BOrd.make(""), null);
   
   /**
-   * Get the {@code BqlQuery} property.
-   * @see #BqlQuery
+   * Get the {@code QueryPath} property.
+   * @see #QueryPath
    */
-  public String getBqlQuery() { return getString(BqlQuery); }
+  public BOrd getQueryPath() { return (BOrd)get(QueryPath); }
   
   /**
-   * Set the {@code BqlQuery} property.
-   * @see #BqlQuery
+   * Set the {@code QueryPath} property.
+   * @see #QueryPath
    */
-  public void setBqlQuery(String v) { setString(BqlQuery, v, null); }
+  public void setQueryPath(BOrd v) { set(QueryPath, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "TagRulesOrd"
@@ -133,29 +124,6 @@ public class BTagBuilder extends BComponent {
    * @see #TagRulesOrd
    */
   public void setTagRulesOrd(BOrd v) { set(TagRulesOrd, v, null); }
-
-////////////////////////////////////////////////////////////////
-// Property "RelRulesOrd"
-////////////////////////////////////////////////////////////////
-  
-  /**
-   * Slot for the {@code RelRulesOrd} property.
-   * @see #getRelRulesOrd
-   * @see #setRelRulesOrd
-   */
-  public static final Property RelRulesOrd = newProperty(0, BOrd.make("file:^sysBuilder/RelRules.json"), BFacets.make(BFacets.TARGET_TYPE, "baja:IFile"));
-  
-  /**
-   * Get the {@code RelRulesOrd} property.
-   * @see #RelRulesOrd
-   */
-  public BOrd getRelRulesOrd() { return (BOrd)get(RelRulesOrd); }
-  
-  /**
-   * Set the {@code RelRulesOrd} property.
-   * @see #RelRulesOrd
-   */
-  public void setRelRulesOrd(BOrd v) { set(RelRulesOrd, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "SysWorker"
@@ -255,14 +223,37 @@ public class BTagBuilder extends BComponent {
 /*+ ------------ END BAJA AUTO GENERATED CODE -------------- +*/
 
     //PRIVATE FIELDS
-    private static Logger logger = Logger.getLogger("DMI_SysBuilder_Service");
+    private static Logger logger = Logger.getLogger("DMI_SysBuilder_TagBuilder");
     private Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private JsonObject RulesDoc = new JsonObject();
 
     //COMPONENT CALLBACKS
     @Override
     public void started(){
+
+        BOrd fileOrd = getTagRulesOrd();
+        try{
+            BIFile file = (BIFile)fileOrd.get(this);
+            file.read();
+        }catch(UnresolvedException ue){
+            logger.warning("File ORD Unresolved: \n"+
+                    ue.getCause());
+            OrdQuery[] qps = fileOrd.parse();
+            FilePath fp = (FilePath)qps[qps.length-1];
+            try{
+                BIFile file = BFileSystem.INSTANCE.makeFile(fp);
+                file.write("Log start: ".concat(
+                        BAbsTime.now().encodeToString()).getBytes());
+            }
+            catch(IOException ioe){ logger.severe("File IO Error - Couldn't make the file: \n"+
+                    ioe.getCause());}
+
+        }catch(IOException io){
+            logger.severe("File IO Error: "+io.getCause());
+        }
+
         //TODO: Deserialize into collection of BTagRule components and add to BTagBuilder as DynamicProperties
+
     }
 
     /**
@@ -295,7 +286,19 @@ public class BTagBuilder extends BComponent {
     public void doReadDoc(){
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
             RulesDoc = this.getRulesDoc(getTagRulesOrd());
-            logger.info(gson.toJson(RulesDoc));
+            logger.info("Rules Json Document ("+RulesDoc.size()
+                    +"):\n"+gson.toJson(RulesDoc));
+            for (String s : RulesDoc.keySet()) {
+                logger.info(s);
+            }
+            RulesDoc.keySet().forEach( e -> {
+                JsonElement element = RulesDoc.get(e);
+                logger.info(e);
+                logger.info("JSON ARRAY: "+element.isJsonArray());
+                logger.info("JSON OBJECT: "+element.isJsonObject());
+                logger.info("JSON OBJECT: "+element.isJsonPrimitive());
+                logger.info("JSON OBJECT: "+element.isJsonNull());
+            });
             return null;
         });
     }
@@ -337,23 +340,61 @@ public class BTagBuilder extends BComponent {
      * */
 
     public void doBuildAll(){
+//            local:|fox:|station:|slot:/Drivers/JciN2Network|bql:select name from control:ControlPoint where name like '*T' and type like 'control:NumericPoint'
         try{
-            BQLResolver resolver = new BQLResolver();
-//            ArrayList<BComponent> queryObjects = resolver.resolve(BString.make(getBqlQuery()));
-            ArrayList<BComponent> queryObjects = null;
-
             //TODO: Check the Rules json array to see if it has rules, if it does loop through all the points adding tags as per the rules.
 
+            Resolver resolver = new Resolver();
+
             AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
+                RulesDoc = getRulesDoc(getTagRulesOrd());
                 JsonArray rules = RulesDoc.getAsJsonArray("rules");
-                for(JsonElement rule: rules){ logger.info(gson.toJson(rule)); }
+
+                rules.forEach( rule -> {
+                    if(rule.isJsonObject()){
+
+                        try{
+                            JsonArray names = null;
+                            String id = null;
+                            String type = null;
+                            String path = getQueryPath().encodeToString();
+                            String bqlStart = "|bql:select name from control:ControlPoint where name like \'";
+                            String bqlMed = "\' and type like \'";
+                            String bqlEnd = "\'";
+
+                            for(String e: rule.getAsJsonObject().keySet()){
+                                JsonElement prop = rule.getAsJsonObject().get(e);
+
+                                if(e.equals("id") && prop.isJsonPrimitive()){
+                                    id = prop.getAsString();
+                                }else if(e.equals("type") && prop.isJsonPrimitive()){
+                                    type = prop.getAsString();
+                                }else if(e.equals("names") && prop.isJsonArray()){
+                                    names = prop.getAsJsonArray();
+                                }else{
+                                    logger.warning("TagBuilder - BuildAll...rule property type unknown...!");
+                                }
+                            }
+
+                            for(JsonElement el: names){
+                                String name = el.getAsString();
+                                String bql = path.concat(bqlStart + name).concat(bqlMed + type).concat(bqlEnd);
+                                ArrayList<BComponent> queryObjects = resolver.resolve(BString.make( bql ));
+                                logger.info(bql);
+
+                                for (BComponent obj : queryObjects) {
+                                    logger.info(obj.getName());
+                                    logger.info(obj.getSlotPath().toString());
+                                }
+                            }
+
+                        }catch(UnresolvedException ue){logger.severe(ue.getMessage()); ue.printStackTrace();}
+                    }else{
+                        logger.warning("TagBuilder Rule is not a valid JSON object...!");
+                    }
+                });
                 return null;
             });
-
-//            for (BComponent obj : queryObjects) {
-//                logger.info(obj.getName());
-//            }
-
         }catch(Exception e){
             logger.severe(e.getMessage());
             e.printStackTrace();

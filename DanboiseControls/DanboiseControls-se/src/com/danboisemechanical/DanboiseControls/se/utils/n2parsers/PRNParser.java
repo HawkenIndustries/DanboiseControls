@@ -264,5 +264,5 @@ public class PRNParser {
     }
 
     //FIELDS
-    private static Logger logger = Logger.getLogger("DMI_SysBuilder_Service");
+    private static Logger logger = Logger.getLogger("DMI_SysBuilder_PRNBuilder");
 }

@@ -275,6 +275,6 @@ public class BSinglePRNJob extends BSimpleJob {
   private PRNParser prn = new PRNParser();
   private N2DevDef n2Dev;
   private ArrayList<N2PointDef>n2PointList;
-  private Logger logger = Logger.getLogger("DMI_PRNBuilder");
+  private Logger logger = Logger.getLogger("DMI_SysBuilder_PRNBuilder");
 
 }
