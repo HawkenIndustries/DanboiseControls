@@ -7,74 +7,99 @@ import javax.baja.sys.*;
 @NiagaraType
 
 @NiagaraProperty(
-        name = "TargetId",
+        name = "ns",
         type = "baja:String",
-        defaultValue = "BString.make(\"\")",
-        flags = Flags.SUMMARY
+        defaultValue = "BString.make(\"\")"
 )
 @NiagaraProperty(
-        name = "NiagaraType",
+        name = "tag",
         type = "baja:String",
-        defaultValue = "BString.make(\"\")",
-        flags = Flags.SUMMARY
+        defaultValue = "BString.make(\"\")"
+)
+@NiagaraProperty(
+        name = "types",
+        type = "baja:String",
+        defaultValue = "BString.make(\"\")"
 )
 @NiagaraProperty(
         name = "PointNames",
         type = "baja:String",
-        defaultValue = "BString.make(\"\")",
-        flags = Flags.SUMMARY
+        defaultValue = "BString.make(\"\")"
 )
 
 public class BTagRule extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule(2407661259)1.0$ @*/
-/* Generated Wed Jun 26 09:43:01 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule(4043345574)1.0$ @*/
+/* Generated Tue Jul 02 14:11:48 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
-// Property "TargetId"
+// Property "ns"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code TargetId} property.
-   * @see #getTargetId
-   * @see #setTargetId
+   * Slot for the {@code ns} property.
+   * @see #getNs
+   * @see #setNs
    */
-  public static final Property TargetId = newProperty(Flags.SUMMARY, BString.make(""), null);
+  public static final Property ns = newProperty(0, BString.make(""), null);
   
   /**
-   * Get the {@code TargetId} property.
-   * @see #TargetId
+   * Get the {@code ns} property.
+   * @see #ns
    */
-  public String getTargetId() { return getString(TargetId); }
+  public String getNs() { return getString(ns); }
   
   /**
-   * Set the {@code TargetId} property.
-   * @see #TargetId
+   * Set the {@code ns} property.
+   * @see #ns
    */
-  public void setTargetId(String v) { setString(TargetId, v, null); }
+  public void setNs(String v) { setString(ns, v, null); }
 
 ////////////////////////////////////////////////////////////////
-// Property "NiagaraType"
+// Property "tag"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code NiagaraType} property.
-   * @see #getNiagaraType
-   * @see #setNiagaraType
+   * Slot for the {@code tag} property.
+   * @see #getTag
+   * @see #setTag
    */
-  public static final Property NiagaraType = newProperty(Flags.SUMMARY, BString.make(""), null);
+  public static final Property tag = newProperty(0, BString.make(""), null);
   
   /**
-   * Get the {@code NiagaraType} property.
-   * @see #NiagaraType
+   * Get the {@code tag} property.
+   * @see #tag
    */
-  public String getNiagaraType() { return getString(NiagaraType); }
+  public String getTag() { return getString(tag); }
   
   /**
-   * Set the {@code NiagaraType} property.
-   * @see #NiagaraType
+   * Set the {@code tag} property.
+   * @see #tag
    */
-  public void setNiagaraType(String v) { setString(NiagaraType, v, null); }
+  public void setTag(String v) { setString(tag, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "types"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code types} property.
+   * @see #getTypes
+   * @see #setTypes
+   */
+  public static final Property types = newProperty(0, BString.make(""), null);
+  
+  /**
+   * Get the {@code types} property.
+   * @see #types
+   */
+  public String getTypes() { return getString(types); }
+  
+  /**
+   * Set the {@code types} property.
+   * @see #types
+   */
+  public void setTypes(String v) { setString(types, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "PointNames"
@@ -85,7 +110,7 @@ public class BTagRule extends BComponent {
    * @see #getPointNames
    * @see #setPointNames
    */
-  public static final Property PointNames = newProperty(Flags.SUMMARY, BString.make(""), null);
+  public static final Property PointNames = newProperty(0, BString.make(""), null);
   
   /**
    * Get the {@code PointNames} property.

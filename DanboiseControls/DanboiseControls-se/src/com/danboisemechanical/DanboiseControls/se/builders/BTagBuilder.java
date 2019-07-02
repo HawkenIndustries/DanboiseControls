@@ -11,12 +11,15 @@ import javax.baja.file.BIFile;
 import javax.baja.file.FilePath;
 import javax.baja.naming.BOrd;
 import javax.baja.naming.OrdQuery;
+import javax.baja.naming.SlotPath;
 import javax.baja.naming.UnresolvedException;
 import javax.baja.nre.annotations.Facet;
 import javax.baja.nre.annotations.NiagaraAction;
 import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
 import javax.baja.sys.*;
+import javax.baja.tag.Id;
+import javax.baja.tag.Tag;
 import javax.baja.util.IFuture;
 import javax.baja.util.Invocation;
 import java.io.File;
@@ -33,8 +36,12 @@ import java.util.logging.Logger;
 @NiagaraProperty(
         name = "QueryPath",
         type = "baja:Ord",
-        defaultValue = "BOrd.make(\"\")",
-        flags = Flags.SUMMARY
+        defaultValue = "BOrd.make(\"\")"
+)
+@NiagaraProperty(
+        name = "QueryBaseType",
+        type = "baja:String",
+        defaultValue = "BString.make(\"\")"
 )
 @NiagaraProperty(
         name = "TagRulesOrd",
@@ -76,8 +83,8 @@ import java.util.logging.Logger;
 
 public class BTagBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(799414114)1.0$ @*/
-/* Generated Mon Jul 01 15:18:40 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(1731170166)1.0$ @*/
+/* Generated Tue Jul 02 13:20:34 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "QueryPath"
@@ -88,7 +95,7 @@ public class BTagBuilder extends BComponent {
    * @see #getQueryPath
    * @see #setQueryPath
    */
-  public static final Property QueryPath = newProperty(Flags.SUMMARY, BOrd.make(""), null);
+  public static final Property QueryPath = newProperty(0, BOrd.make(""), null);
   
   /**
    * Get the {@code QueryPath} property.
@@ -101,6 +108,29 @@ public class BTagBuilder extends BComponent {
    * @see #QueryPath
    */
   public void setQueryPath(BOrd v) { set(QueryPath, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "QueryBaseType"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code QueryBaseType} property.
+   * @see #getQueryBaseType
+   * @see #setQueryBaseType
+   */
+  public static final Property QueryBaseType = newProperty(0, BString.make(""), null);
+  
+  /**
+   * Get the {@code QueryBaseType} property.
+   * @see #QueryBaseType
+   */
+  public String getQueryBaseType() { return getString(QueryBaseType); }
+  
+  /**
+   * Set the {@code QueryBaseType} property.
+   * @see #QueryBaseType
+   */
+  public void setQueryBaseType(String v) { setString(QueryBaseType, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "TagRulesOrd"
@@ -294,10 +324,6 @@ public class BTagBuilder extends BComponent {
             RulesDoc.keySet().forEach( e -> {
                 JsonElement element = RulesDoc.get(e);
                 logger.info(e);
-                logger.info("JSON ARRAY: "+element.isJsonArray());
-                logger.info("JSON OBJECT: "+element.isJsonObject());
-                logger.info("JSON OBJECT: "+element.isJsonPrimitive());
-                logger.info("JSON OBJECT: "+element.isJsonNull());
             });
             return null;
         });
@@ -312,13 +338,25 @@ public class BTagBuilder extends BComponent {
     public void doAddRule(BTagRule parameter){
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
             JsonObject rule = new JsonObject();
+            JsonArray types = new JsonArray();
             JsonArray names = new JsonArray();
 
             Arrays.stream(parameter.getPointNames().split(","))
                     .forEach(e -> names.add(e));
 
-            rule.addProperty("id", parameter.getTargetId());
-            rule.addProperty("type", parameter.getNiagaraType());
+            rule.addProperty("ns", parameter.getNs());
+            rule.addProperty("tag", parameter.getTag());
+            if(parameter.getTypes().contains(",")){
+                Arrays.stream(parameter.getTypes().split(","))
+                        .forEach( e -> types.add(e));
+                rule.add("types", types);
+            }else if(parameter.getTypes().isEmpty()){
+                rule.add("types", types);
+            }
+            else{
+                types.add(parameter.getTypes());
+                rule.add("types", types);
+            }
             rule.add("names", names);
             RulesDoc.getAsJsonArray("rules").add(rule);
             logger.info(gson.toJson(RulesDoc));
@@ -340,9 +378,7 @@ public class BTagBuilder extends BComponent {
      * */
 
     public void doBuildAll(){
-//            local:|fox:|station:|slot:/Drivers/JciN2Network|bql:select name from control:ControlPoint where name like '*T' and type like 'control:NumericPoint'
         try{
-            //TODO: Check the Rules json array to see if it has rules, if it does loop through all the points adding tags as per the rules.
 
             Resolver resolver = new Resolver();
 
@@ -355,42 +391,67 @@ public class BTagBuilder extends BComponent {
 
                         try{
                             JsonArray names = null;
-                            String id = null;
-                            String type = null;
+                            JsonArray types = null;
+                            String ns = null;
+                            String tag = null;
+
                             String path = getQueryPath().encodeToString();
-                            String bqlStart = "|bql:select name from control:ControlPoint where name like \'";
-                            String bqlMed = "\' and type like \'";
+                            String bqlSelect = "|bql:select slotPath ";
+                            String bqlFrom = "from "+ getQueryBaseType();
+                            String bqlWhere = " where name like \'";
+                            String bqlType = "\' and type like \'";
                             String bqlEnd = "\'";
+
+                            boolean validRule = true;
 
                             for(String e: rule.getAsJsonObject().keySet()){
                                 JsonElement prop = rule.getAsJsonObject().get(e);
 
-                                if(e.equals("id") && prop.isJsonPrimitive()){
-                                    id = prop.getAsString();
-                                }else if(e.equals("type") && prop.isJsonPrimitive()){
-                                    type = prop.getAsString();
+                                if(e.equals("ns") && prop.isJsonPrimitive()){
+                                    ns = prop.getAsString();
+                                }else if(e.equals("tag") && prop.isJsonPrimitive()){
+                                    tag = prop.getAsString();
+                                }else if(e.equals("types") && prop.isJsonArray()){
+                                    types = prop.getAsJsonArray();
                                 }else if(e.equals("names") && prop.isJsonArray()){
                                     names = prop.getAsJsonArray();
                                 }else{
-                                    logger.warning("TagBuilder - BuildAll...rule property type unknown...!");
+                                    logger.warning("ERROR - BuildAll...rule property type unknown...!");
+                                    validRule = false;
+                                    break;
                                 }
                             }
+                            if(validRule){
+                                for(JsonElement el: names){
+                                    String name = el.getAsString();
 
-                            for(JsonElement el: names){
-                                String name = el.getAsString();
-                                String bql = path.concat(bqlStart + name).concat(bqlMed + type).concat(bqlEnd);
-                                ArrayList<BComponent> queryObjects = resolver.resolve(BString.make( bql ));
-                                logger.info(bql);
+                                    for(JsonElement type: types){
+                                        String bql = path.concat(bqlSelect.concat(bqlFrom.concat(bqlWhere + name))) +
+                                                bqlType + type.getAsString() + bqlEnd;
+                                        ArrayList<BComponent> queryObjects = resolver.resolve(BString.make( bql ));
 
-                                for (BComponent obj : queryObjects) {
-                                    logger.info(obj.getName());
-                                    logger.info(obj.getSlotPath().toString());
+                                        for (BComponent obj : queryObjects) {
+                                            try{
+                                                Id.verifyTagId(ns, tag);
+                                                Id i = Id.newId(ns, tag);
+                                                Tag t = Tag.newTag(i.getQName());
+                                                obj.tags().set(t);
+                                                logger.info("TAG ADDED: "+ t.getId().toString() +
+                                                        "\t-\t" + obj.getSlotPath().toString());}
+                                            catch(Exception e)
+                                            {
+                                                logger.warning("ERROR-TAG NOT ADDED: "+ e.getMessage());
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        logger.info(bql);
+                                    }
                                 }
-                            }
+                            }else{ logger.warning("ERROR - Invalid TagRule...!!!"); }
 
                         }catch(UnresolvedException ue){logger.severe(ue.getMessage()); ue.printStackTrace();}
                     }else{
-                        logger.warning("TagBuilder Rule is not a valid JSON object...!");
+                        logger.warning("ERROR - Rule is not a valid JSON object...!");
                     }
                 });
                 return null;
