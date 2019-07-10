@@ -10,16 +10,12 @@ import javax.baja.sys.Sys;
 import java.util.ArrayList;
 
 public class Resolver {
-    /***
-     * resolve a slot path and a type into a qualified bql query, and return the list of BObject references.
-     * @param type: Niagara type to use in the bql query.
-     * @param stationPath: Station path used to qualify a bql query.
-     * @return ArrayList<BObject>: Return an array-list of resolved BObjects to the caller.
-     */
+
 @SuppressWarnings("unchecked")
-    public ArrayList<BObject> resolveType(BString type, BString stationPath){
+    public ArrayList<BObject> resolveType(String whType, String stationPath, String fromType){
         ArrayList<BObject> objRefs = new ArrayList<>();
-        BOrd ord =  BOrd.make(stationPath.getString().concat("|bql:select name from control:ControlPoint where type = "+type));
+        BOrd ord =  BOrd.make(stationPath.concat("|bql:select name from "+fromType+" where type = '"+whType+"'"));
+
         BITable<BObject> t = (BITable)ord.resolve(Sys.getStation()).get();
         TableCursor<BObject> c = t.cursor();
         while(c.next()){
@@ -33,9 +29,9 @@ public class Resolver {
     }
 
     @SuppressWarnings("unchecked")
-    public ArrayList<BObject> resolveName(BString name, BString stationPath){
+    public ArrayList<BObject> resolveName(String name, String stationPath, String fromType){
         ArrayList<BObject> objRefs = new ArrayList<>();
-        BOrd ord =  BOrd.make(stationPath.getString().concat("|bql:select name from control:ControlPoint where name like "+"*"+name+"*"));
+        BOrd ord =  BOrd.make(stationPath.concat("|bql:select name from "+fromType+" where name like "+"'*"+name+"*'"));
         BITable<BObject> t = (BITable)ord.resolve(Sys.getStation()).get();
         TableCursor<BObject> c = t.cursor();
         while(c.next()){
@@ -49,9 +45,9 @@ public class Resolver {
     }
 
     @SuppressWarnings("unchecked")
-    public ArrayList<BObject> resolveSlotPath(BString slotPath, BString stationPath){
+    public ArrayList<BObject> resolveSlotPath(String slotPath, String stationPath, String fromType){
         ArrayList<BObject> objRefs = new ArrayList<>();
-        BOrd ord =  BOrd.make(stationPath.getString().concat("|bql:select name from control:ControlPoint where name like "+"*"+slotPath+"*"));
+        BOrd ord =  BOrd.make(stationPath.concat("|bql:select name from "+fromType+" where name like "+"'*"+slotPath+"*'"));
         BITable<BObject> t = (BITable)ord.resolve(Sys.getStation()).get();
         TableCursor<BObject> c = t.cursor();
         while(c.next()){
@@ -65,8 +61,8 @@ public class Resolver {
     }
 
     /***
-     * resolve a qualified bql query, and return the list of BObject references.
-     * @param query: fully qualified bql query.
+     * resolve a bql query, and return the list of BObject references.
+     * @param query: bql query.
      * @return ArrayList<BObject>
      */
 

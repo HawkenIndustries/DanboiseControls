@@ -8,6 +8,8 @@
   <type class="com.danboisemechanical.DanboiseControls.se.jobs.BSinglePRNJob" name="SinglePRNJob"/>
   <!--com.danboisemechanical.DanboiseControls.se.workers-->
   <type class="com.danboisemechanical.DanboiseControls.se.workers.BSysBuilderWorker" name="SysBuilderWorker"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.workers.BAlarmBuilderWorker" name="AlarmBuilderWorker"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.workers.BTagBuilderWorker" name="TagBuilderWorker"/>
   <!--com.danboisemechanical.DanboiseControls.se.alarms.algorithms-->
   <type class="com.danboisemechanical.DanboiseControls.se.alarms.algorithms.BSetpointErrorAlgorithm" name="SetpointErrorAlgorithm"/>
   <!--com.danboisemechanical.DanboiseControls.se.alarms-->
@@ -18,10 +20,14 @@
   <!--com.danboisemechanical.DanboiseControls.se.builders-->
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder" name="PRNBuilder"/>
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder" name="TagBuilder"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder" name="AlarmBuilder"/>
   <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRulesules-->
-  <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRules-->
-  <type class="com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule" name="TagRule"/>
-  <!--com.danboisemechanical.DanboiseControls.se.models.alarms-->
-  <type class="com.danboisemechanical.DanboiseControls.se.models.alarms.BAbstractAlarmType" name="AbstractAlarmType"/>
-  <type class="com.danboisemechanical.DanboiseControls.se.models.alarms.BFireAlm" name="FireAlm"/>
+  <!--com.danboisemechanical.DanboiseControls.se.models.builder_ruless-->
+  <!--com.danboisemechanical.DanboiseControls.se.models.builder_rules-->
+  <type class="com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule" name="TagRule"/>
+  <!--com.danboisemechanical.DanboiseControls.se.utils.alarms-->
+  <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BAlarmMaker" name="AlarmMaker"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BAlarmUtil" name="AlarmUtil"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BFireAlmMaker" name="FireAlmMaker"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BHiTempAlmMaker" name="HiTempAlmMaker"/>
 </types>

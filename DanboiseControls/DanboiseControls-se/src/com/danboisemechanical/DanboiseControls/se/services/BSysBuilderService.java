@@ -1,5 +1,6 @@
 package com.danboisemechanical.DanboiseControls.se.services;
 
+import com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder;
 import com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder;
 import com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder;
 
@@ -23,12 +24,19 @@ import java.util.logging.Logger;
         flags = Flags.SUMMARY
 )
 
+@NiagaraProperty(
+        name = "AlarmBuilder",
+        type = "DanboiseControls:AlarmBuilder",
+        defaultValue = "BAlarmBuilder.make()",
+        flags = Flags.SUMMARY
+)
+
 @NiagaraType
 
 public class BSysBuilderService extends BAbstractService {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService(3273597476)1.0$ @*/
-/* Generated Sat Jun 15 08:54:13 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService(3847424386)1.0$ @*/
+/* Generated Sat Jul 06 08:45:10 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "PRNBuilder"
@@ -75,6 +83,29 @@ public class BSysBuilderService extends BAbstractService {
    * @see #TagBuilder
    */
   public void setTagBuilder(BTagBuilder v) { set(TagBuilder, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "AlarmBuilder"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code AlarmBuilder} property.
+   * @see #getAlarmBuilder
+   * @see #setAlarmBuilder
+   */
+  public static final Property AlarmBuilder = newProperty(Flags.SUMMARY, BAlarmBuilder.make(), null);
+  
+  /**
+   * Get the {@code AlarmBuilder} property.
+   * @see #AlarmBuilder
+   */
+  public BAlarmBuilder getAlarmBuilder() { return (BAlarmBuilder)get(AlarmBuilder); }
+  
+  /**
+   * Set the {@code AlarmBuilder} property.
+   * @see #AlarmBuilder
+   */
+  public void setAlarmBuilder(BAlarmBuilder v) { set(AlarmBuilder, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Type

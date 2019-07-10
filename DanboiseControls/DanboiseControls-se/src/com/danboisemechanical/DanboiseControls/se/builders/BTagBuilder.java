@@ -1,9 +1,10 @@
 package com.danboisemechanical.DanboiseControls.se.builders;
 
-import com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule;
+import com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule;
 import com.danboisemechanical.DanboiseControls.se.utils.general.Resolver;
 import com.danboisemechanical.DanboiseControls.se.workers.BSysBuilderWorker;
 
+import com.danboisemechanical.DanboiseControls.se.workers.BTagBuilderWorker;
 import com.google.gson.*;
 
 import javax.baja.file.BFileSystem;
@@ -11,7 +12,6 @@ import javax.baja.file.BIFile;
 import javax.baja.file.FilePath;
 import javax.baja.naming.BOrd;
 import javax.baja.naming.OrdQuery;
-import javax.baja.naming.SlotPath;
 import javax.baja.naming.UnresolvedException;
 import javax.baja.nre.annotations.Facet;
 import javax.baja.nre.annotations.NiagaraAction;
@@ -53,9 +53,9 @@ import java.util.logging.Logger;
 )
 
 @NiagaraProperty(
-        name = "SysWorker",
-        type = "DanboiseControls:SysBuilderWorker",
-        defaultValue = "BSysBuilderWorker.make()",
+        name = "TagWorker",
+        type = "DanboiseControls:TagBuilderWorker",
+        defaultValue = "BTagBuilderWorker.make()",
         flags = Flags.HIDDEN
 )
 
@@ -83,8 +83,8 @@ import java.util.logging.Logger;
 
 public class BTagBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(1731170166)1.0$ @*/
-/* Generated Tue Jul 02 13:20:34 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(626485612)1.0$ @*/
+/* Generated Mon Jul 08 15:20:03 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "QueryPath"
@@ -156,27 +156,27 @@ public class BTagBuilder extends BComponent {
   public void setTagRulesOrd(BOrd v) { set(TagRulesOrd, v, null); }
 
 ////////////////////////////////////////////////////////////////
-// Property "SysWorker"
+// Property "TagWorker"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code SysWorker} property.
-   * @see #getSysWorker
-   * @see #setSysWorker
+   * Slot for the {@code TagWorker} property.
+   * @see #getTagWorker
+   * @see #setTagWorker
    */
-  public static final Property SysWorker = newProperty(Flags.HIDDEN, BSysBuilderWorker.make(), null);
+  public static final Property TagWorker = newProperty(Flags.HIDDEN, BTagBuilderWorker.make(), null);
   
   /**
-   * Get the {@code SysWorker} property.
-   * @see #SysWorker
+   * Get the {@code TagWorker} property.
+   * @see #TagWorker
    */
-  public BSysBuilderWorker getSysWorker() { return (BSysBuilderWorker)get(SysWorker); }
+  public BTagBuilderWorker getTagWorker() { return (BTagBuilderWorker)get(TagWorker); }
   
   /**
-   * Set the {@code SysWorker} property.
-   * @see #SysWorker
+   * Set the {@code TagWorker} property.
+   * @see #TagWorker
    */
-  public void setSysWorker(BSysBuilderWorker v) { set(SysWorker, v, null); }
+  public void setTagWorker(BTagBuilderWorker v) { set(TagWorker, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Action "AddRule"
@@ -524,9 +524,7 @@ public class BTagBuilder extends BComponent {
 
     public IFuture post(Action a, BValue arg, Context c){
         Invocation work = new Invocation (this, a , arg, c);
-        this.getSysWorker().postWork(work);
+        this.getTagWorker().postWork(work);
         return null;
     }
-
-
 }

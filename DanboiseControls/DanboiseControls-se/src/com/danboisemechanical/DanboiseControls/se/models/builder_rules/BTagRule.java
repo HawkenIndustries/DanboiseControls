@@ -1,4 +1,4 @@
-package com.danboisemechanical.DanboiseControls.se.models.BuilderRules;
+package com.danboisemechanical.DanboiseControls.se.models.builder_rules;
 
 import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
@@ -29,7 +29,7 @@ import javax.baja.sys.*;
 
 public class BTagRule extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.models.BuilderRules.BTagRule(4043345574)1.0$ @*/
+/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(4043345574)1.0$ @*/
 /* Generated Tue Jul 02 14:11:48 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
