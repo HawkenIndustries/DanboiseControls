@@ -1,14 +1,21 @@
 package com.danboisemechanical.DanboiseControls.se.builders;
 
 import com.danboisemechanical.DanboiseControls.se.models.enums.BAlarmTypeEnum;
+import com.danboisemechanical.DanboiseControls.se.utils.alarms.BFireAlmMaker;
 import com.danboisemechanical.DanboiseControls.se.workers.BAlarmBuilderWorker;
 
+import javax.baja.alarm.ext.BAlarmSourceExt;
+import javax.baja.naming.BOrd;
+import javax.baja.naming.UnresolvedException;
 import javax.baja.nre.annotations.NiagaraAction;
 import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
+import javax.baja.query.BQueryResult;
 import javax.baja.sys.*;
+import javax.baja.tag.Entity;
 import javax.baja.util.IFuture;
 import javax.baja.util.Invocation;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 @NiagaraType
@@ -19,7 +26,12 @@ import java.util.logging.Logger;
         defaultValue = "BAlarmTypeEnum.None",
         flags = Flags.SUMMARY
 )
-
+@NiagaraProperty(
+        name = "neqlQuery",
+        type = "baja:String",
+        defaultValue = "\"\"",
+        flags = Flags.SUMMARY
+)
 @NiagaraProperty(
         name = "AlarmWorker",
         type = "DanboiseControls:AlarmBuilderWorker",
@@ -38,8 +50,8 @@ import java.util.logging.Logger;
 
 public class BAlarmBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder(1881621854)1.0$ @*/
-/* Generated Mon Jul 08 15:20:03 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder(1117032981)1.0$ @*/
+/* Generated Wed Jul 10 09:04:32 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "AlarmType"
@@ -63,6 +75,29 @@ public class BAlarmBuilder extends BComponent {
    * @see #AlarmType
    */
   public void setAlarmType(BEnum v) { set(AlarmType, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "neqlQuery"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code neqlQuery} property.
+   * @see #getNeqlQuery
+   * @see #setNeqlQuery
+   */
+  public static final Property neqlQuery = newProperty(Flags.SUMMARY, "\"\"", null);
+  
+  /**
+   * Get the {@code neqlQuery} property.
+   * @see #neqlQuery
+   */
+  public String getNeqlQuery() { return getString(neqlQuery); }
+  
+  /**
+   * Set the {@code neqlQuery} property.
+   * @see #neqlQuery
+   */
+  public void setNeqlQuery(String v) { setString(neqlQuery, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "AlarmWorker"
@@ -133,15 +168,13 @@ public class BAlarmBuilder extends BComponent {
 
   public void doBuildOne(){
 
-
     switch(this.getAlarmType().getOrdinal()){
       case 0:
         break;
       case 1:
-          String query = "";
+
         break;
       case 4:
-
         break;
       default:
           logger.warning("Build One - enum ordinal not found...!");
@@ -159,5 +192,23 @@ public class BAlarmBuilder extends BComponent {
       Invocation work = new Invocation (this, a , arg, c);
       this.getAlarmWorker().postWork(work);
       return null;
+  }
+
+  private void findAlarmPoints(String neql, BEnum type){
+    try{
+      BOrd query = BOrd.make(getNeqlQuery());
+      BQueryResult result = (BQueryResult)query.resolve(Sys.getStation()).get();
+      Iterator<Entity> results = result.getResults();
+      results.forEachRemaining(entity -> {
+        BComponent almPoint = ((BComponent)entity);
+        logger.info(almPoint.getName());
+        BFireAlmMaker firMkr = new BFireAlmMaker(almPoint, getAlarmType());
+        BAlarmSourceExt almExt = firMkr.makeExtension();
+        almPoint.add(type.getTag()+"Extension", almExt);
+      });
+    }catch(UnresolvedException ue){
+      logger.severe(ue.getMessage());
+      ue.printStackTrace();
+    }
   }
 }

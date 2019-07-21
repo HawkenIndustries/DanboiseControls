@@ -25,8 +25,8 @@ public class BFireAlmMaker extends BAlarmMaker{
    * zone: NGF
    * almType: EF
    * **/
-  public BFireAlmMaker(BComponent p){
-    super(p);
+  public BFireAlmMaker(BComponent p, BEnum almType){
+    super(p, almType);
   }
 
   public BAlarmSourceExt makeExtension(){

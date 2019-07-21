@@ -12,6 +12,7 @@ import javax.baja.file.BIFile;
 import javax.baja.file.FilePath;
 import javax.baja.naming.BOrd;
 import javax.baja.naming.OrdQuery;
+import javax.baja.naming.SlotPath;
 import javax.baja.naming.UnresolvedException;
 import javax.baja.nre.annotations.Facet;
 import javax.baja.nre.annotations.NiagaraAction;
@@ -51,40 +52,35 @@ import java.util.logging.Logger;
                 @Facet(name = "BFacets.TARGET_TYPE", value = "\"baja:IFile\"")
         }
 )
-
 @NiagaraProperty(
         name = "TagWorker",
         type = "DanboiseControls:TagBuilderWorker",
         defaultValue = "BTagBuilderWorker.make()",
         flags = Flags.HIDDEN
 )
-
 @NiagaraAction(
         name = "AddRule",
         parameterType = "DanboiseControls:TagRule",
         defaultValue = "BTagRule.make()",
         flags = Flags.SUMMARY | Flags.ASYNC
 )
-
 @NiagaraAction(
         name = "BuildAll",
         flags = Flags.SUMMARY | Flags.ASYNC
 )
-
 @NiagaraAction(
-        name = "MakeDoc",
-        flags = Flags.SUMMARY
+        name = "ClearDoc",
+        flags = Flags.HIDDEN
 )
-
 @NiagaraAction(
-        name = "ReadDoc",
+        name = "ReadFromDoc",
         flags = Flags.SUMMARY | Flags.ASYNC
 )
 
 public class BTagBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(626485612)1.0$ @*/
-/* Generated Mon Jul 08 15:20:03 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(1720492420)1.0$ @*/
+/* Generated Sat Jul 20 10:51:13 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "QueryPath"
@@ -211,36 +207,36 @@ public class BTagBuilder extends BComponent {
   public void BuildAll() { invoke(BuildAll, null, null); }
 
 ////////////////////////////////////////////////////////////////
-// Action "MakeDoc"
+// Action "ClearDoc"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code MakeDoc} action.
-   * @see #MakeDoc()
+   * Slot for the {@code ClearDoc} action.
+   * @see #ClearDoc()
    */
-  public static final Action MakeDoc = newAction(Flags.SUMMARY, null);
+  public static final Action ClearDoc = newAction(Flags.HIDDEN, null);
   
   /**
-   * Invoke the {@code MakeDoc} action.
-   * @see #MakeDoc
+   * Invoke the {@code ClearDoc} action.
+   * @see #ClearDoc
    */
-  public void MakeDoc() { invoke(MakeDoc, null, null); }
+  public void ClearDoc() { invoke(ClearDoc, null, null); }
 
 ////////////////////////////////////////////////////////////////
-// Action "ReadDoc"
+// Action "ReadFromDoc"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code ReadDoc} action.
-   * @see #ReadDoc()
+   * Slot for the {@code ReadFromDoc} action.
+   * @see #ReadFromDoc()
    */
-  public static final Action ReadDoc = newAction(Flags.SUMMARY | Flags.ASYNC, null);
+  public static final Action ReadFromDoc = newAction(Flags.SUMMARY | Flags.ASYNC, null);
   
   /**
-   * Invoke the {@code ReadDoc} action.
-   * @see #ReadDoc
+   * Invoke the {@code ReadFromDoc} action.
+   * @see #ReadFromDoc
    */
-  public void ReadDoc() { invoke(ReadDoc, null, null); }
+  public void ReadFromDoc() { invoke(ReadFromDoc, null, null); }
 
 ////////////////////////////////////////////////////////////////
 // Type
@@ -256,34 +252,62 @@ public class BTagBuilder extends BComponent {
     private static Logger logger = Logger.getLogger("DMI_SysBuilder_TagBuilder");
     private Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private JsonObject RulesDoc = new JsonObject();
+    private boolean setToDelete = true;
 
     //COMPONENT CALLBACKS
     @Override
     public void started(){
-
-        BOrd fileOrd = getTagRulesOrd();
-        try{
-            BIFile file = (BIFile)fileOrd.get(this);
-            file.read();
-        }catch(UnresolvedException ue){
-            logger.warning("File ORD Unresolved: \n"+
-                    ue.getCause());
-            OrdQuery[] qps = fileOrd.parse();
-            FilePath fp = (FilePath)qps[qps.length-1];
+        AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
+            BOrd fileOrd = getTagRulesOrd();
             try{
-                BIFile file = BFileSystem.INSTANCE.makeFile(fp);
-                file.write("Log start: ".concat(
-                        BAbsTime.now().encodeToString()).getBytes());
+                this.invoke(ReadFromDoc, null);
+            }catch(UnresolvedException ue){
+                logger.warning("File ORD Unresolved: \n"+
+                        ue.getCause());
+                OrdQuery[] qps = fileOrd.parse();
+                FilePath fp = (FilePath)qps[qps.length-1];
+                try{
+                    BIFile file = BFileSystem.INSTANCE.makeFile(fp);
+
+                    RulesDoc.add("rules", new JsonArray());
+                    file.write(gson.toJson(RulesDoc).getBytes());
+
+                    logger.info("Tag Builder in the SysBuilder service started, but could not find a tag rule's file...\n" +
+                            gson.toJson(RulesDoc));
+                }
+                catch(IOException ioe){ logger.severe("File IO Error - Couldn't make the file: \n"+
+                        ioe.getCause());
+                }
             }
-            catch(IOException ioe){ logger.severe("File IO Error - Couldn't make the file: \n"+
-                    ioe.getCause());}
+            return null;
+        });
+    }
 
-        }catch(IOException io){
-            logger.severe("File IO Error: "+io.getCause());
-        }
+    @Override
+    public void removed(Property prop, BValue oldVal, Context cx){
+        AccessController.doPrivileged((PrivilegedAction<Void>)()->{
+            try{
+                Thread.sleep(50);
+                if(setToDelete){
+                    String ruleId = prop.getName().substring(10,prop.getName().length()-1);
+                    logger.info(prop.getName());
+                    logger.info(ruleId);
+                    RulesDoc.getAsJsonArray("rules").forEach( e -> {
+                        logger.info(e.getAsJsonObject().get("id").getAsString());
 
-        //TODO: Deserialize into collection of BTagRule components and add to BTagBuilder as DynamicProperties
-
+                        if(e.getAsJsonObject().get("id").getAsString().contains(ruleId)){
+                            RulesDoc.getAsJsonArray("rules").remove(e);
+                            logger.info(ruleId+"\n"+
+                                    e.getAsJsonObject().get("_id").getAsString());
+                        }
+                    });
+                }
+            }catch(Exception e){
+                logger.severe(e.getMessage());
+                e.printStackTrace();
+            }
+            return null;
+        });
     }
 
     /**
@@ -292,7 +316,7 @@ public class BTagBuilder extends BComponent {
      * @return void
      * */
 
-    public void doMakeDoc(){
+    public void doClearDoc(){
 
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
             try{
@@ -313,18 +337,68 @@ public class BTagBuilder extends BComponent {
      * @return void
      * */
 
-    public void doReadDoc(){
+    public void doReadFromDoc(){
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
+            setToDelete = false;
+
             RulesDoc = this.getRulesDoc(getTagRulesOrd());
             logger.info("Rules Json Document ("+RulesDoc.size()
                     +"):\n"+gson.toJson(RulesDoc));
             for (String s : RulesDoc.keySet()) {
                 logger.info(s);
             }
-            RulesDoc.keySet().forEach( e -> {
-                JsonElement element = RulesDoc.get(e);
-                logger.info(e);
-            });
+
+            try{
+                Arrays.stream(this.getDynamicPropertiesArray()).forEach( d -> {
+                    if(d.getName().contains("TagRule")){ this.remove(d.getName()); }
+                });
+            }catch(Exception e){
+                logger.severe(e.getMessage());
+                e.printStackTrace();
+            }
+
+            try{
+                RulesDoc = getRulesDoc(getTagRulesOrd());
+                JsonArray rules = RulesDoc.getAsJsonArray("rules");
+
+                rules.forEach( r ->{
+                    JsonObject rule = r.getAsJsonObject();
+                    JsonArray types = rule.get("types").getAsJsonArray();
+                    JsonArray names = rule.get("names").getAsJsonArray();
+
+                    BTagRule ruleComp = BTagRule.make();
+                    ruleComp.setFlags(ruleComp.getSlot("types"), Flags.HIDDEN);
+                    ruleComp.setFlags(ruleComp.getSlot("pointNames"), Flags.HIDDEN);
+
+                    ruleComp.setNs(rule.get("ns").getAsString());
+                    ruleComp.setTag(rule.get("tag").getAsString());
+
+                    ruleComp.add("TypeMatches", new BComponent());
+
+                    types.forEach( t ->
+                        ruleComp.get("TypeMatches").asComponent()
+                                .add(SlotPath.escape("TypeMatch ".
+                                                concat(String.valueOf(t.hashCode()))),
+                                        BString.make(t.getAsString()))
+                    );
+                    ruleComp.add("NameMatches", new BComponent());
+                    names.forEach( n ->
+                        ruleComp.get("NameMatches").asComponent()
+                                .add(SlotPath.escape("NameMatch ".
+                                                concat(String.valueOf(n.hashCode()))),
+                                        BString.make(n.getAsString()))
+                    );
+                    this.add(SlotPath.escape("TagRule ".
+                                    concat(ruleComp.getId())),
+                                    ruleComp);
+                });
+
+            }catch(Exception e){
+                e.getMessage();
+                e.printStackTrace();
+                setToDelete = true;
+            }
+            setToDelete = true;
             return null;
         });
     }
@@ -343,7 +417,7 @@ public class BTagBuilder extends BComponent {
 
             Arrays.stream(parameter.getPointNames().split(","))
                     .forEach(e -> names.add(e));
-
+            rule.addProperty("id", parameter.getId());
             rule.addProperty("ns", parameter.getNs());
             rule.addProperty("tag", parameter.getTag());
             if(parameter.getTypes().contains(",")){

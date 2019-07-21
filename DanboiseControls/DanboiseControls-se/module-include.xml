@@ -21,8 +21,6 @@
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder" name="PRNBuilder"/>
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder" name="TagBuilder"/>
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder" name="AlarmBuilder"/>
-  <!--com.danboisemechanical.DanboiseControls.se.models.BuilderRulesules-->
-  <!--com.danboisemechanical.DanboiseControls.se.models.builder_ruless-->
   <!--com.danboisemechanical.DanboiseControls.se.models.builder_rules-->
   <type class="com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule" name="TagRule"/>
   <!--com.danboisemechanical.DanboiseControls.se.utils.alarms-->

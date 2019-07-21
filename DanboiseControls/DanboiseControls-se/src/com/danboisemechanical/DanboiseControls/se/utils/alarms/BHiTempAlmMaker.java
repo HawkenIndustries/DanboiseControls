@@ -4,6 +4,7 @@ package com.danboisemechanical.DanboiseControls.se.utils.alarms;
 import javax.baja.alarm.ext.BAlarmSourceExt;
 import javax.baja.nre.annotations.NiagaraType;
 import javax.baja.sys.BComponent;
+import javax.baja.sys.BEnum;
 import javax.baja.sys.Sys;
 import javax.baja.sys.Type;
 
@@ -28,18 +29,19 @@ public class BHiTempAlmMaker extends BAlarmMaker {
      * zone: NGE
      * almType: HT
      * **/
-    public BHiTempAlmMaker(BComponent p){
-        super(p);
+    public BHiTempAlmMaker(BComponent p, BEnum t){
+        super(p, t);
     }
 
   public BAlarmSourceExt makeExtension(){
-    alarmExt.setMetaData(
-            alarmConfig.makeMetadata("NGE"+ alarmCount, "HT")
-    );
-    alarmExt.setOffnormalAlgorithm(alarmConfig.makeAlgorithm());
-      super.makeAlmMessages("HI TEMP ALARM ACTIVE",
-            "HI TEMP ALARM HAS CLEARED");
-    alarmCount++;
-    return alarmExt;
+      alarmExt.setAlarmClass("AlarmLoggingClass");
+      alarmExt.setMetaData(
+              alarmConfig.makeMetadata("NGE"+ alarmCount, "HT")
+      );
+      alarmExt.setOffnormalAlgorithm(alarmConfig.makeAlgorithm());
+        super.makeAlmMessages("HI TEMP ALARM ACTIVE",
+              "HI TEMP ALARM HAS CLEARED");
+      alarmCount++;
+      return alarmExt;
   }
 }

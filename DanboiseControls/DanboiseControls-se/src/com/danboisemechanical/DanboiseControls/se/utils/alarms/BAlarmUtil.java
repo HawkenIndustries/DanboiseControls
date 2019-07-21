@@ -182,48 +182,13 @@ public  class BAlarmUtil extends BComponent {
   public BFacets makeMetadata(String zone, String almType) {
     String[] metaTags = {"GLC", "Zone", "ID", "AlarmType"};
     BString[] metaValues = {BString.make(
-            BStation.stationName.toString()),
+            Sys.getStation().getStationName()),
             BString.make(zone),
             BString.make("01"),
             BString.make(almType)
     };
     BFacets meta = BFacets.make(metaTags, metaValues);
     return meta;
-  }
-  /**
-   *Makes and returns the alarm's source name as a literal string of BFormat type. The method finds out if the object
-   * supplied is point, and whether the proxyExt is null. If the point has a proxy, the method checks the pointExt for
-   * point folders, if there are points folders, the method determines it is a N2, or gateway like integration and
-   * finds the parent component of the point, provided it is a point folder type of object, the method gets the
-   * display names and formats them before returning.
-   * @param point: BObject, it should cast down to a controlPoint or else it will throw an exception.
-   * @Return BFormat
-   * **/
-  public BFormat makeSourceName(BComponent point){
-    BFormat srcName = null;
-    boolean isGateway = false;
-    try{
-      BControlPoint p = (BControlPoint)point;
-      if(!(p.getProxyExt() instanceof BNullProxyExt)){
-        BPointDeviceExt dExt = ((BProxyExt)p.getProxyExt()).getDeviceExt();
-        BComponent[] children = dExt.getChildComponents();
-        for(int i  = 0; i < children.length; i++){
-          if(children[i] instanceof BPointFolder){
-            isGateway = true;
-            break;
-          }
-        }
-        if(isGateway){
-          srcName = BFormat.make(
-                  point.getParent().getDisplayName(null).concat(","+ point.getDisplayName(null)));
-        }else{
-          srcName = BFormat.make(
-                  dExt.getDevice().getDisplayName(null).concat(","+ p.getDisplayName(null)));
-        }
-      }
-    }catch(Exception e){e.printStackTrace();}
-    if(srcName.isNull()){srcName = BFormat.make("ERROR...makeSourceName()");}
-    return srcName;
   }
 
     /**

@@ -3,6 +3,7 @@ package com.danboisemechanical.DanboiseControls.se.utils.alarms;
 import javax.baja.alarm.ext.BAlarmSourceExt;
 import javax.baja.nre.annotations.NiagaraType;
 import javax.baja.sys.BComponent;
+import javax.baja.sys.BEnum;
 import javax.baja.sys.Sys;
 import javax.baja.sys.Type;
 import javax.baja.util.BFormat;
@@ -29,10 +30,11 @@ public class BAlarmMaker extends BComponent {
     protected BAlarmSourceExt alarmExt = new BAlarmSourceExt();
     protected int alarmCount = 1;
 
-    public BAlarmMaker(BComponent point){
+    public BAlarmMaker(BComponent point, BEnum almType){
         sourcePoint = point;
         alarmExt.setSourceName(
-                alarmConfig.makeSourceName(sourcePoint)
+            BFormat.make(Sys.getStation().getStationName() + "/".
+                    concat(almType.getTag()))
         );
         alarmExt.setTimeDelay(alarmConfig.getTimeDelay());
         alarmExt.setTimeDelayToNormal(alarmConfig.getTimeDelayToNormal());

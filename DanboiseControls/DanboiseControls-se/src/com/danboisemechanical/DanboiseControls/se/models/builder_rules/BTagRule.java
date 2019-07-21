@@ -4,8 +4,17 @@ import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
 import javax.baja.sys.*;
 
-@NiagaraType
+import java.util.Random;
+import java.util.UUID;
+import java.util.logging.Logger;
 
+@NiagaraType
+@NiagaraProperty(
+        name = "id",
+        type = "baja:String",
+        defaultValue = "\"\"",
+        flags = Flags.READONLY|Flags.SUMMARY
+)
 @NiagaraProperty(
         name = "ns",
         type = "baja:String",
@@ -22,15 +31,38 @@ import javax.baja.sys.*;
         defaultValue = "BString.make(\"\")"
 )
 @NiagaraProperty(
-        name = "PointNames",
+        name = "pointNames",
         type = "baja:String",
         defaultValue = "BString.make(\"\")"
 )
 
 public class BTagRule extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(4043345574)1.0$ @*/
-/* Generated Tue Jul 02 14:11:48 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(3002103639)1.0$ @*/
+/* Generated Sat Jul 20 11:17:08 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+
+////////////////////////////////////////////////////////////////
+// Property "id"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code id} property.
+   * @see #getId
+   * @see #setId
+   */
+  public static final Property id = newProperty(Flags.READONLY | Flags.SUMMARY, "\"\"", null);
+  
+  /**
+   * Get the {@code id} property.
+   * @see #id
+   */
+  public String getId() { return getString(id); }
+  
+  /**
+   * Set the {@code id} property.
+   * @see #id
+   */
+  public void setId(String v) { setString(id, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "ns"
@@ -102,27 +134,27 @@ public class BTagRule extends BComponent {
   public void setTypes(String v) { setString(types, v, null); }
 
 ////////////////////////////////////////////////////////////////
-// Property "PointNames"
+// Property "pointNames"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code PointNames} property.
+   * Slot for the {@code pointNames} property.
    * @see #getPointNames
    * @see #setPointNames
    */
-  public static final Property PointNames = newProperty(0, BString.make(""), null);
+  public static final Property pointNames = newProperty(0, BString.make(""), null);
   
   /**
-   * Get the {@code PointNames} property.
-   * @see #PointNames
+   * Get the {@code pointNames} property.
+   * @see #pointNames
    */
-  public String getPointNames() { return getString(PointNames); }
+  public String getPointNames() { return getString(pointNames); }
   
   /**
-   * Set the {@code PointNames} property.
-   * @see #PointNames
+   * Set the {@code pointNames} property.
+   * @see #pointNames
    */
-  public void setPointNames(String v) { setString(PointNames, v, null); }
+  public void setPointNames(String v) { setString(pointNames, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Type
@@ -134,7 +166,29 @@ public class BTagRule extends BComponent {
 
 /*+ ------------ END BAJA AUTO GENERATED CODE -------------- +*/
 
+
+  private static Logger logger = Logger.getLogger("DMI_SysBuilder_TagBuilder");
+
+  public BTagRule(){
+    try{
+      UUID uuid = UUID.randomUUID();
+      setId("_id".concat(uuid.toString()));
+    }catch(Exception e){
+      logger.severe(e.getMessage());
+      e.printStackTrace();
+      Random r = new Random();
+      int hash = Math.abs(this.hashCode());
+      for(int i = 0; i < Integer.bitCount(hash) / 32; i++){
+        hash += r.nextInt(999);
+        hash -= r.nextInt(99);
+      }
+      setId("_id".concat(String.valueOf(hash).substring(0,6)));
+    }
+
+  }
+
   public static BTagRule make(){
     return new BTagRule();
   }
+
 }

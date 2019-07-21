@@ -113,3 +113,52 @@ moduleTestJar {
   from('srcTest') {
   }
 }
+
+def pass = 'Danboise_1'
+def storePath = 'C:\\Users\\David\\Niagara4.7\\vykon\\certManagement'
+def storeName = 'dc-cert.jks'
+def alias = 'dc-cert'
+def certPath = 'C:\\Users\\David\\Niagara4.7\\vykon\\certManagement'
+def jarPath = 'C:\\Niagara\\Niagara-4.7.109.20\\modules'
+def jarName = project.name
+
+def station = 'M29663'
+
+task runStation(type:Exec){
+  workingDir = '../../../../../../../../Niagara/Niagara-4.7.109.20/bin'
+  commandLine 'station', station
+  ignoreExitValue = true
+}
+
+task makeKeystore(type:Exec){
+  workingDir '../../../../../../../../Niagara/Niagara-4.7.109.20/jre/bin'
+  commandLine 'keytool',
+          '-genkey',
+          '-alias', alias,
+          '-keyAlg', 'RSA',
+          '-ext', 'EKU=\"codeSigning\"',
+          '-validity', '600',
+          '-keypass', pass,
+          '-storepass', pass,
+          '-keystore', storePath.concat('\\'+storeName),
+          '-dname', 'CN=Victor Smolinski, OU=Controls, O=Danboise Controls, L=Farmington, ST=Michigan, C=US'
+}
+
+task exportCert(type:Exec){
+  workingDir '../../../../../../../../Niagara/Niagara-4.7.109.20/jre/bin'
+  commandLine 'keytool',
+          '-export',
+          '-keystore', storePath.concat('\\'+storeName),
+          '-alias', alias,
+          '-file', certPath+'\\'+alias+'.cer',
+          '-rfc'
+}
+
+task signJar(type:Exec){
+  commandLine 'jarsigner',
+          '-keystore', storePath.concat('\\'+storeName),
+          '-storepass', pass,
+          jarPath.concat('\\'+jarName+'.jar'),
+          alias
+  ignoreExitValue = true
+}
