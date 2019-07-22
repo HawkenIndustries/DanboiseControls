@@ -2,7 +2,6 @@ package com.danboisemechanical.DanboiseControls.se.builders;
 
 import com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule;
 import com.danboisemechanical.DanboiseControls.se.utils.general.Resolver;
-import com.danboisemechanical.DanboiseControls.se.workers.BSysBuilderWorker;
 
 import com.danboisemechanical.DanboiseControls.se.workers.BTagBuilderWorker;
 import com.google.gson.*;
@@ -30,6 +29,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @NiagaraType
@@ -70,7 +71,7 @@ import java.util.logging.Logger;
 )
 @NiagaraAction(
         name = "ClearDoc",
-        flags = Flags.HIDDEN
+        flags = Flags.SUMMARY
 )
 @NiagaraAction(
         name = "ReadFromDoc",
@@ -79,8 +80,8 @@ import java.util.logging.Logger;
 
 public class BTagBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(1720492420)1.0$ @*/
-/* Generated Sat Jul 20 10:51:13 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(2726419828)1.0$ @*/
+/* Generated Sun Jul 21 19:39:40 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "QueryPath"
@@ -214,7 +215,7 @@ public class BTagBuilder extends BComponent {
    * Slot for the {@code ClearDoc} action.
    * @see #ClearDoc()
    */
-  public static final Action ClearDoc = newAction(Flags.HIDDEN, null);
+  public static final Action ClearDoc = newAction(Flags.SUMMARY, null);
   
   /**
    * Invoke the {@code ClearDoc} action.
@@ -289,18 +290,31 @@ public class BTagBuilder extends BComponent {
             try{
                 Thread.sleep(50);
                 if(setToDelete){
-                    String ruleId = prop.getName().substring(10,prop.getName().length()-1);
+                    JsonObject obj2Delete = null;
+                    JsonArray rules = RulesDoc.getAsJsonArray("rules");
+                    String ruleId = SlotPath.unescape(
+                            prop.getName().substring(10,prop.getName().length()-1));
                     logger.info(prop.getName());
                     logger.info(ruleId);
-                    RulesDoc.getAsJsonArray("rules").forEach( e -> {
-                        logger.info(e.getAsJsonObject().get("id").getAsString());
-
-                        if(e.getAsJsonObject().get("id").getAsString().contains(ruleId)){
-                            RulesDoc.getAsJsonArray("rules").remove(e);
-                            logger.info(ruleId+"\n"+
-                                    e.getAsJsonObject().get("_id").getAsString());
+                    for(JsonElement e: rules){
+                        try{
+                            if(e.getAsJsonObject().get("id").getAsString()
+                                    .contains(ruleId)){
+                                obj2Delete = e.getAsJsonObject();
+                            }
+                        }catch(ConcurrentModificationException cme){
+                            logger.severe(cme.getMessage());
+                            cme.printStackTrace();
                         }
-                    });
+                        logger.info(e.getAsJsonObject().get("id").getAsString());
+                    }
+
+                    RulesDoc.getAsJsonArray("rules")
+                            .remove(obj2Delete);
+                    logger.info(gson.toJson(RulesDoc));
+                    FileWriter fw = tagFileWriter();
+                    fw.write(gson.toJson(RulesDoc));
+                    fw.close();
                 }
             }catch(Exception e){
                 logger.severe(e.getMessage());
@@ -309,6 +323,8 @@ public class BTagBuilder extends BComponent {
             return null;
         });
     }
+
+    //ACTION CALLBACKS
 
     /**
      *
@@ -326,7 +342,10 @@ public class BTagBuilder extends BComponent {
                 fw.write(gson.toJson(RulesDoc));
                 fw.close();
 
-            }catch(Exception io){ io.getMessage(); io.printStackTrace(); }
+            }catch(Exception io){
+                io.getMessage();
+                io.printStackTrace();
+            }
             return null;
         });
     }
@@ -370,6 +389,7 @@ public class BTagBuilder extends BComponent {
                     ruleComp.setFlags(ruleComp.getSlot("types"), Flags.HIDDEN);
                     ruleComp.setFlags(ruleComp.getSlot("pointNames"), Flags.HIDDEN);
 
+                    ruleComp.setId(rule.get("id").getAsString());
                     ruleComp.setNs(rule.get("ns").getAsString());
                     ruleComp.setTag(rule.get("tag").getAsString());
 
@@ -392,7 +412,6 @@ public class BTagBuilder extends BComponent {
                                     concat(ruleComp.getId())),
                                     ruleComp);
                 });
-
             }catch(Exception e){
                 e.getMessage();
                 e.printStackTrace();
@@ -410,16 +429,27 @@ public class BTagBuilder extends BComponent {
     * */
 
     public void doAddRule(BTagRule parameter){
+
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
             JsonObject rule = new JsonObject();
             JsonArray types = new JsonArray();
             JsonArray names = new JsonArray();
 
-            Arrays.stream(parameter.getPointNames().split(","))
-                    .forEach(e -> names.add(e));
+            try{
+                final UUID uuid = UUID.randomUUID();
+                parameter.setId("_id".concat(uuid.toString()));
+            }catch(Exception e){
+                logger.severe(e.getMessage());
+                e.printStackTrace();
+            }
+
             rule.addProperty("id", parameter.getId());
             rule.addProperty("ns", parameter.getNs());
             rule.addProperty("tag", parameter.getTag());
+
+            Arrays.stream(parameter.getPointNames().split(","))
+                    .forEach(e -> names.add(e));
+
             if(parameter.getTypes().contains(",")){
                 Arrays.stream(parameter.getTypes().split(","))
                         .forEach( e -> types.add(e));

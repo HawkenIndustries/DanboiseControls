@@ -4,8 +4,6 @@ import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
 import javax.baja.sys.*;
 
-import java.util.Random;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 @NiagaraType
@@ -13,7 +11,7 @@ import java.util.logging.Logger;
         name = "id",
         type = "baja:String",
         defaultValue = "\"\"",
-        flags = Flags.READONLY|Flags.SUMMARY
+        flags = Flags.SUMMARY
 )
 @NiagaraProperty(
         name = "ns",
@@ -38,8 +36,8 @@ import java.util.logging.Logger;
 
 public class BTagRule extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(3002103639)1.0$ @*/
-/* Generated Sat Jul 20 11:17:08 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(1439005787)1.0$ @*/
+/* Generated Sun Jul 21 20:12:24 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "id"
@@ -50,7 +48,7 @@ public class BTagRule extends BComponent {
    * @see #getId
    * @see #setId
    */
-  public static final Property id = newProperty(Flags.READONLY | Flags.SUMMARY, "\"\"", null);
+  public static final Property id = newProperty(Flags.SUMMARY, "\"\"", null);
   
   /**
    * Get the {@code id} property.
@@ -166,26 +164,9 @@ public class BTagRule extends BComponent {
 
 /*+ ------------ END BAJA AUTO GENERATED CODE -------------- +*/
 
-
   private static Logger logger = Logger.getLogger("DMI_SysBuilder_TagBuilder");
 
-  public BTagRule(){
-    try{
-      UUID uuid = UUID.randomUUID();
-      setId("_id".concat(uuid.toString()));
-    }catch(Exception e){
-      logger.severe(e.getMessage());
-      e.printStackTrace();
-      Random r = new Random();
-      int hash = Math.abs(this.hashCode());
-      for(int i = 0; i < Integer.bitCount(hash) / 32; i++){
-        hash += r.nextInt(999);
-        hash -= r.nextInt(99);
-      }
-      setId("_id".concat(String.valueOf(hash).substring(0,6)));
-    }
-
-  }
+  public BTagRule(){}
 
   public static BTagRule make(){
     return new BTagRule();
