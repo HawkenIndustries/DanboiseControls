@@ -324,6 +324,20 @@ public class BTagBuilder extends BComponent {
         });
     }
 
+    //TODO: 07/22/2019 - Make callbacks for the cut, copy, paste, and save baja component ops; in order to sync up the...
+    //TODO: 07/22/2019 - workbench with the json rule file organically and with minimal low level user intervention.
+
+    //TODO: 07/22/2019 - Make a added baja component callback to refresh the prop sheet with the newly added rule...
+    //TODO: 07/22/2019 - in order to always display the current contents of the file. Do the same for all other file-sync-ops.
+
+    //TODO: 07/22/2019 - Make a set of type filters and add syntax checks for them on all action callbacks querying for tags to be added in the format :
+    //TODO: 07/22/2019 - all->
+    //TODO: 07/22/2019 - numeric->all
+    //TODO: 07/22/2019 - boolean->all
+    //TODO: 07/22/2019 - enum->all
+
+    //TODO: 07/22/2019 - Add ignore upper/lower case for name filters, and regex checks as needed.
+
     //ACTION CALLBACKS
 
     /**
