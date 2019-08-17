@@ -231,6 +231,9 @@ public class BSinglePRNJob extends BSimpleJob {
                                     i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress()+"\n"+ine.getStackTrace().toString());
                             log().message("[ERROR] BSinglePRNJob.java:255 -- IllegalNameException ADI - ENUMS...!!!\t"+
                                     i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress()+"\n");
+                        }catch(Exception ex){
+                            logger.severe(ex.getMessage());
+                            ex.printStackTrace();
                         }
 
                     }else{ logger.warning("[WARNING] point type parsed from prn file not matched!!...BSinglePRNJob.java:264"
@@ -251,11 +254,11 @@ public class BSinglePRNJob extends BSimpleJob {
                 n2.add(name, dev);
             }catch(IllegalNameException ine){ n2.add("dmi_n2Device", dev); }
 
-            this.log().message(e.getType().getTypeName() + " FOUND... - BSinglePRNJob.java:272");
+            this.log().message(e.getType().getTypeName() + " FOUND... - BSinglePRNJob");
             this.log().message(n2Dev.getDevName()+" parsed from prn file...");
             this.log().message(name+" parsed name");
         }else{
-            this.log().message("JciN2Network NOT FOUND ... while attempting to add n2 device from PRN file...!!! - BSinglePRNJob.java:276");
+            this.log().message("JciN2Network NOT FOUND ... while attempting to add n2 device from PRN file...!!! - BSinglePRNJob");
         }
     });
 

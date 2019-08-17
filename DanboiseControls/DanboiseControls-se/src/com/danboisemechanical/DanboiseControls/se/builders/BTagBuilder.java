@@ -1,5 +1,6 @@
 package com.danboisemechanical.DanboiseControls.se.builders;
 
+import com.danboisemechanical.DanboiseControls.se.models.builder_rules.BFilter;
 import com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule;
 import com.danboisemechanical.DanboiseControls.se.utils.general.Resolver;
 
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @NiagaraType
 
@@ -71,17 +73,21 @@ import java.util.logging.Logger;
 )
 @NiagaraAction(
         name = "ClearDoc",
-        flags = Flags.SUMMARY
+        flags = Flags.SUMMARY | Flags.ASYNC
 )
 @NiagaraAction(
         name = "ReadFromDoc",
         flags = Flags.SUMMARY | Flags.ASYNC
 )
+@NiagaraAction(
+        name = "SyncToFile",
+        flags = Flags.SUMMARY | Flags.ASYNC
+)
 
 public class BTagBuilder extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(2726419828)1.0$ @*/
-/* Generated Sun Jul 21 19:39:40 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder(1999939874)1.0$ @*/
+/* Generated Wed Jul 24 08:19:36 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "QueryPath"
@@ -215,7 +221,7 @@ public class BTagBuilder extends BComponent {
    * Slot for the {@code ClearDoc} action.
    * @see #ClearDoc()
    */
-  public static final Action ClearDoc = newAction(Flags.SUMMARY, null);
+  public static final Action ClearDoc = newAction(Flags.SUMMARY | Flags.ASYNC, null);
   
   /**
    * Invoke the {@code ClearDoc} action.
@@ -240,6 +246,22 @@ public class BTagBuilder extends BComponent {
   public void ReadFromDoc() { invoke(ReadFromDoc, null, null); }
 
 ////////////////////////////////////////////////////////////////
+// Action "SyncToFile"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code SyncToFile} action.
+   * @see #SyncToFile()
+   */
+  public static final Action SyncToFile = newAction(Flags.SUMMARY | Flags.ASYNC, null);
+  
+  /**
+   * Invoke the {@code SyncToFile} action.
+   * @see #SyncToFile
+   */
+  public void SyncToFile() { invoke(SyncToFile, null, null); }
+
+////////////////////////////////////////////////////////////////
 // Type
 ////////////////////////////////////////////////////////////////
   
@@ -249,6 +271,18 @@ public class BTagBuilder extends BComponent {
 
 /*+ ------------ END BAJA AUTO GENERATED CODE -------------- +*/
 
+    //TODO: 07/22/2019 - USE THE changed() BAJA-COMPONENT CALLBACK FOR ALL THE FILE-SYNC-OPS THAT DON'T HAVE THEIR OWN.
+
+    //TODO: 07/22/2019 - Make a set of type filters and add syntax checks for them on all action callbacks querying for tags to be added in the format :
+    //TODO: 07/22/2019 - all->
+    //TODO: 07/22/2019 - numeric->all
+    //TODO: 07/22/2019 - boolean->all
+    //TODO: 07/22/2019 - enum->all
+
+    //TODO: 07/22/2019 - Add ignore upper/lower case for name filters, and regex checks as needed.
+
+
+
     //PRIVATE FIELDS
     private static Logger logger = Logger.getLogger("DMI_SysBuilder_TagBuilder");
     private Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
@@ -257,7 +291,7 @@ public class BTagBuilder extends BComponent {
 
     //COMPONENT CALLBACKS
     @Override
-    public void started(){
+    public void atSteadyState(){
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
             BOrd fileOrd = getTagRulesOrd();
             try{
@@ -271,7 +305,13 @@ public class BTagBuilder extends BComponent {
                     BIFile file = BFileSystem.INSTANCE.makeFile(fp);
 
                     RulesDoc.add("rules", new JsonArray());
-                    file.write(gson.toJson(RulesDoc).getBytes());
+                    try{
+                        RulesDoc.keySet().stream().collect(Collectors.toSet());
+                        file.write(gson.toJson(RulesDoc).getBytes());
+
+                    }catch(Exception e){
+                        logger.warning("Cant add to Rules document because of possible duplicate...!");
+                    }
 
                     logger.info("Tag Builder in the SysBuilder service started, but could not find a tag rule's file...\n" +
                             gson.toJson(RulesDoc));
@@ -285,29 +325,40 @@ public class BTagBuilder extends BComponent {
     }
 
     @Override
+    public void added(Property prop, Context cx){
+        if(this.isRunning()){
+            logger.info("TAG  BUILDER --- TAG BUILDER --- TAG BUILDER...ADDED A RULE...!");
+            logger.info("Property Added: \t"+prop.getName()+"\t"+this.get(prop.getName()));
+            logger.info("Property Type: \t"+prop.getType());
+            this.invoke(AddRule, this.get(prop.getName()));
+        }
+    }
+
+    @Override
     public void removed(Property prop, BValue oldVal, Context cx){
         AccessController.doPrivileged((PrivilegedAction<Void>)()->{
             try{
-                Thread.sleep(50);
                 if(setToDelete){
                     JsonObject obj2Delete = null;
                     JsonArray rules = RulesDoc.getAsJsonArray("rules");
                     String ruleId = SlotPath.unescape(
                             prop.getName().substring(10,prop.getName().length()-1));
-                    logger.info(prop.getName());
-                    logger.info(ruleId);
+
                     for(JsonElement e: rules){
                         try{
                             if(e.getAsJsonObject().get("id").getAsString()
                                     .contains(ruleId)){
                                 obj2Delete = e.getAsJsonObject();
+                                logger.info(e.getAsJsonObject().get("id").getAsString());
                             }
                         }catch(ConcurrentModificationException cme){
                             logger.severe(cme.getMessage());
                             cme.printStackTrace();
                         }
-                        logger.info(e.getAsJsonObject().get("id").getAsString());
                     }
+
+                    logger.info(prop.getName());
+                    logger.info(ruleId);
 
                     RulesDoc.getAsJsonArray("rules")
                             .remove(obj2Delete);
@@ -323,20 +374,6 @@ public class BTagBuilder extends BComponent {
             return null;
         });
     }
-
-    //TODO: 07/22/2019 - Make callbacks for the cut, copy, paste, and save baja component ops; in order to sync up the...
-    //TODO: 07/22/2019 - workbench with the json rule file organically and with minimal low level user intervention.
-
-    //TODO: 07/22/2019 - Make a added baja component callback to refresh the prop sheet with the newly added rule...
-    //TODO: 07/22/2019 - in order to always display the current contents of the file. Do the same for all other file-sync-ops.
-
-    //TODO: 07/22/2019 - Make a set of type filters and add syntax checks for them on all action callbacks querying for tags to be added in the format :
-    //TODO: 07/22/2019 - all->
-    //TODO: 07/22/2019 - numeric->all
-    //TODO: 07/22/2019 - boolean->all
-    //TODO: 07/22/2019 - enum->all
-
-    //TODO: 07/22/2019 - Add ignore upper/lower case for name filters, and regex checks as needed.
 
     //ACTION CALLBACKS
 
@@ -370,6 +407,33 @@ public class BTagBuilder extends BComponent {
      * @return void
      * */
 
+    public void doSyncToFile(){
+
+        AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
+            try{
+                logger.info(gson.toJson(RulesDoc));
+                RulesDoc.keySet().stream().collect(Collectors.toSet());
+                FileWriter fw = tagFileWriter();
+                fw.write(gson.toJson(RulesDoc));
+                fw.close();
+            }catch(IOException io){
+                io.getMessage();
+                io.printStackTrace();
+            }catch(Exception e){
+                logger.warning("Failed op due to possible duplicate rule");
+                e.getMessage();
+                e.printStackTrace();
+            }
+            return null;
+        });
+    }
+
+    /**
+     *
+     * @param
+     * @return void
+     * */
+
     public void doReadFromDoc(){
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
             setToDelete = false;
@@ -380,7 +444,6 @@ public class BTagBuilder extends BComponent {
             for (String s : RulesDoc.keySet()) {
                 logger.info(s);
             }
-
             try{
                 Arrays.stream(this.getDynamicPropertiesArray()).forEach( d -> {
                     if(d.getName().contains("TagRule")){ this.remove(d.getName()); }
@@ -401,41 +464,53 @@ public class BTagBuilder extends BComponent {
 
                     BTagRule ruleComp = BTagRule.make();
                     ruleComp.setFlags(ruleComp.getSlot("types"), Flags.HIDDEN);
-                    ruleComp.setFlags(ruleComp.getSlot("pointNames"), Flags.HIDDEN);
+                    ruleComp.setFlags(ruleComp.getSlot("names"), Flags.HIDDEN);
 
                     ruleComp.setId(rule.get("id").getAsString());
                     ruleComp.setNs(rule.get("ns").getAsString());
                     ruleComp.setTag(rule.get("tag").getAsString());
 
-                    ruleComp.add("TypeMatches", new BComponent());
+                    ruleComp.add("TypeFilters", new BComponent());
+                    ruleComp.add("NameFilters", new BComponent());
+                    BComponent typesComp = ruleComp.get("TypeFilters").asComponent();
+                    BComponent namesComp = ruleComp.get("NameFilters").asComponent();
 
-                    types.forEach( t ->
-                        ruleComp.get("TypeMatches").asComponent()
-                                .add(SlotPath.escape("TypeMatch ".
-                                                concat(String.valueOf(t.hashCode()))),
-                                        BString.make(t.getAsString()))
-                    );
-                    ruleComp.add("NameMatches", new BComponent());
-                    names.forEach( n ->
-                        ruleComp.get("NameMatches").asComponent()
-                                .add(SlotPath.escape("NameMatch ".
-                                                concat(String.valueOf(n.hashCode()))),
-                                        BString.make(n.getAsString()))
-                    );
+                    for (JsonElement t : types) {
+                        BFilter tFilter = new BFilter();
+                        JsonObject jsonFilter = t.getAsJsonObject();
+                        tFilter.setValue(jsonFilter.get("TypeFilter").getAsString());
+                        tFilter.setFilterID(jsonFilter.get("TypeId").getAsString());
+                        typesComp.add(SlotPath
+                                .escape("TypeFilter "
+                                        .concat(tFilter.getFilterID())),
+                                tFilter);
+                    }
+
+                    for(JsonElement n : names){
+                        BFilter nFilter = new BFilter();
+                        JsonObject jsonFilter = n.getAsJsonObject();
+                        nFilter.setValue(jsonFilter.get("NameFilter").getAsString());
+                        nFilter.setFilterID(jsonFilter.get("NameId").getAsString());
+                        namesComp.add(SlotPath
+                                .escape("NameFilter "
+                                        .concat(nFilter.getFilterID())),
+                                nFilter);
+                    }
+
                     this.add(SlotPath.escape("TagRule ".
                                     concat(ruleComp.getId())),
-                                    ruleComp);
+                            ruleComp);
                 });
             }catch(Exception e){
+                setToDelete = true;
                 e.getMessage();
                 e.printStackTrace();
-                setToDelete = true;
             }
             setToDelete = true;
             return null;
         });
     }
-
+//
     /**
      *
      * @param parameter
@@ -445,10 +520,16 @@ public class BTagBuilder extends BComponent {
     public void doAddRule(BTagRule parameter){
 
         AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
+            /*
+            * Make the rule object, and the complex types like the two arrays of name and type filters.
+            * */
             JsonObject rule = new JsonObject();
             JsonArray types = new JsonArray();
             JsonArray names = new JsonArray();
 
+            /*
+             * Set the Id field using a basic UUID.
+             * */
             try{
                 final UUID uuid = UUID.randomUUID();
                 parameter.setId("_id".concat(uuid.toString()));
@@ -457,28 +538,73 @@ public class BTagBuilder extends BComponent {
                 e.printStackTrace();
             }
 
+            /*
+             *Set all the basic properties of the rule object
+             * */
             rule.addProperty("id", parameter.getId());
             rule.addProperty("ns", parameter.getNs());
             rule.addProperty("tag", parameter.getTag());
 
-            Arrays.stream(parameter.getPointNames().split(","))
-                    .forEach(e -> names.add(e));
 
+            /*
+             *NAME FILTERS...
+             *Iterate through the items in the name filter list, and create a Filter object for each,
+             * add the filter objects to the names array object.
+             * */
+            Arrays.stream(parameter.getNames().split(","))
+                    .forEach(e -> {
+                        JsonObject filter = new JsonObject();
+                        try{
+                            final UUID uuid = UUID.randomUUID();
+                            filter.addProperty("NameId", uuid.toString());
+                            filter.addProperty("NameFilter", e);
+                            names.add(filter);
+                        }catch(Exception ex){
+                            logger.severe(ex.getMessage());
+                            ex.printStackTrace();
+                        }
+                    });
+            rule.add("names", names);
+
+            /*
+            TYPE FILTERS
+             * Iterate through the items if they are formatted as csv, else try to interpret all->.. cmds,
+             * finally throw an error.
+             * */
             if(parameter.getTypes().contains(",")){
                 Arrays.stream(parameter.getTypes().split(","))
-                        .forEach( e -> types.add(e));
+                        .forEach( e -> {
+                            JsonObject filter = new JsonObject();
+                            try{
+                                final UUID uuid = UUID.randomUUID();
+                                filter.addProperty("TypeId", uuid.toString());
+                                filter.addProperty("TypeFilter", e);
+                                types.add(filter);
+                            }catch(Exception ex){
+                                logger.severe(ex.getMessage());
+                                ex.printStackTrace();
+                            }
+                        });
                 rule.add("types", types);
-            }else if(parameter.getTypes().isEmpty()){
-                rule.add("types", types);
+            }else{
+                Exception e = new Exception();
+                try {
+                    logger.severe(e.getLocalizedMessage());
+                    throw e;
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
-            else{
-                types.add(parameter.getTypes());
-                rule.add("types", types);
-            }
-            rule.add("names", names);
+
+            /*
+            *Add the rule record object to the array of rules int the root Json Document Object.
+            * */
             RulesDoc.getAsJsonArray("rules").add(rule);
             logger.info(gson.toJson(RulesDoc));
 
+            /*
+             *Finally serialize and write the modified document to file.
+             * */
             try{
                 FileWriter fw = tagFileWriter();
                 fw.write(gson.toJson(RulesDoc));
@@ -638,6 +764,14 @@ public class BTagBuilder extends BComponent {
         }catch(Exception e){ logger.severe("UNKOWN EXCEPTION...!!\t"+e.getMessage()); }
 
         return null;
+    }
+
+    /**
+     * Method for read only exposure of the rules json array object.
+     * @return JsonArray
+     * */
+    public JsonArray getRulesArray(){
+         return this.RulesDoc.getAsJsonArray("rules");
     }
 
     public IFuture post(Action a, BValue arg, Context c){

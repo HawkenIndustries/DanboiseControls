@@ -1,9 +1,17 @@
 package com.danboisemechanical.DanboiseControls.se.models.builder_rules;
 
+import com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder;
+import com.google.gson.*;
+import com.google.gson.internal.LinkedTreeMap;
+
+import javax.baja.naming.SlotPath;
 import javax.baja.nre.annotations.NiagaraProperty;
 import javax.baja.nre.annotations.NiagaraType;
 import javax.baja.sys.*;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ConcurrentModificationException;
 import java.util.logging.Logger;
 
 @NiagaraType
@@ -29,15 +37,15 @@ import java.util.logging.Logger;
         defaultValue = "BString.make(\"\")"
 )
 @NiagaraProperty(
-        name = "pointNames",
+        name = "names",
         type = "baja:String",
         defaultValue = "BString.make(\"\")"
 )
 
 public class BTagRule extends BComponent {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(1439005787)1.0$ @*/
-/* Generated Sun Jul 21 20:12:24 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule(2799472882)1.0$ @*/
+/* Generated Sun Aug 11 17:04:39 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "id"
@@ -132,27 +140,27 @@ public class BTagRule extends BComponent {
   public void setTypes(String v) { setString(types, v, null); }
 
 ////////////////////////////////////////////////////////////////
-// Property "pointNames"
+// Property "names"
 ////////////////////////////////////////////////////////////////
   
   /**
-   * Slot for the {@code pointNames} property.
-   * @see #getPointNames
-   * @see #setPointNames
+   * Slot for the {@code names} property.
+   * @see #getNames
+   * @see #setNames
    */
-  public static final Property pointNames = newProperty(0, BString.make(""), null);
+  public static final Property names = newProperty(0, BString.make(""), null);
   
   /**
-   * Get the {@code pointNames} property.
-   * @see #pointNames
+   * Get the {@code names} property.
+   * @see #names
    */
-  public String getPointNames() { return getString(pointNames); }
+  public String getNames() { return getString(names); }
   
   /**
-   * Set the {@code pointNames} property.
-   * @see #pointNames
+   * Set the {@code names} property.
+   * @see #names
    */
-  public void setPointNames(String v) { setString(pointNames, v, null); }
+  public void setNames(String v) { setString(names, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Type
@@ -165,8 +173,127 @@ public class BTagRule extends BComponent {
 /*+ ------------ END BAJA AUTO GENERATED CODE -------------- +*/
 
   private static Logger logger = Logger.getLogger("DMI_SysBuilder_TagBuilder");
-
+  private Gson gson = new GsonBuilder()
+                          .setPrettyPrinting()
+                            .serializeNulls().create();
   public BTagRule(){}
+
+  @Override
+  public void changed(Property prop, Context cx){
+    try{
+      if(this.isRunning()){
+        logger.info("TAG RULE ---- TAG RULE ------ TAG RULE...CHANGED");
+        logger.info(getNavParent().getType().toString());
+
+        BTagBuilder builder = (BTagBuilder) getNavParent();
+        AccessController.doPrivileged((PrivilegedAction<Void>)() -> {
+          JsonArray rules = builder.getRulesArray();
+
+          String ruleId = SlotPath.unescape(
+                  this.getName().substring(10,this.getName().length()-1)
+          );
+
+          String oldNs = "";
+          String oldTag = "";
+          String oldNames = "";
+          String oldTypes = "";
+
+          String ns = "";
+          String tag = "";
+          String names = "";
+          String types = "";
+
+
+          for(JsonElement el: rules){
+            try{
+              if(el.getAsJsonObject().get("id").getAsString()
+                      .contains(ruleId)){
+
+                JsonObject obj = el.getAsJsonObject();
+                oldNs = obj.get("ns").getAsString();
+                oldTag = obj.get("tag").getAsString();
+//                oldNames = obj.get("names").getAsString();
+//                oldTypes = obj.get("types").getAsString();
+
+                switch(prop.getName()){
+                  case "id":
+                    logger.warning("id field can't be changed...!!!");
+                    break;
+                  case "ns":
+                    ns = ((BString)this.get(prop.getName())).getString();
+                    break;
+                  case  "tag":
+                    tag = ((BString)this.get(prop.getName())).getString();
+                    break;
+//                  case "names":
+//                    names = ((BString)this.get(prop.getName())).getString();
+//                    break;
+//                  case "types":
+//                    types = ((BString)this.get(prop.getName())).getString();
+//                    break;
+                  default:
+                    logger.warning("rule obj property unknown...!!!");
+                }
+
+                obj.remove("id");
+                obj.addProperty("id", ruleId);
+                if(ns.isEmpty()){
+                  obj.remove("ns");
+                  obj.addProperty("ns", oldNs);
+                }else{
+                  obj.remove("ns");
+                  obj.addProperty("ns", ns);
+                }
+                if(tag.isEmpty()){
+                  obj.remove("tag");
+                  obj.addProperty("tag", oldTag);
+                }else{
+                  obj.remove("tag");
+                  obj.addProperty("tag", tag);
+                }
+//                if(names.isEmpty()){
+//                  obj.remove("names");
+//                  obj.addProperty("names",oldNames);
+//                }else{
+//                  obj.remove("names");
+//                  obj.addProperty("names", names);
+//                }
+//                if(types.isEmpty()){
+//                  obj.remove("types");
+//                  obj.addProperty("types", oldTypes);
+//                }else{
+//                  obj.remove("types");
+//                  obj.addProperty("types", types);
+//                }
+//                logger.info("Changed BAJA Property: "+prop.getName()+"\t"+this.get(prop));
+//                logger.info("Nav Type: "+getNavParent().getType().getDisplayName(cx));
+                logger.info("Json Obj Before\n"+gson.toJson(obj));
+                logger.info("Json Obj After: \n"+gson.toJson(obj));
+              }
+            }catch(ConcurrentModificationException cme){
+              logger.severe(cme.getMessage());
+              cme.printStackTrace();
+            }
+          }
+          return null;
+        });
+      }
+    }catch(Exception e){
+      logger.severe(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void added(Property prop, Context cx){
+    if(this.isRunning()){
+      logger.info("TAG RULE ---- TAG RULE ----- TAG RULE... ADDED");
+      logger.info("\t"+prop.getName()+"\t"+this.get(prop.getName()));
+
+      BTagBuilder builder = (BTagBuilder) getNavParent().getNavParent();
+      builder.invoke(builder.getAction("AddRule"), this.get(prop.getName()));
+    }
+  }
 
   public static BTagRule make(){
     return new BTagRule();

@@ -8,5 +8,6 @@
 *.png
 *.plantuml
 *.MF
+*.txt
 gradlew
 gradlew.bat

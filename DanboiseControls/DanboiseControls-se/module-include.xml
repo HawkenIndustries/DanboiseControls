@@ -6,6 +6,7 @@
   <type class="com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService" name="SysBuilderService"/>
   <!--com.danboisemechanical.DanboiseControls.se.jobs-->
   <type class="com.danboisemechanical.DanboiseControls.se.jobs.BSinglePRNJob" name="SinglePRNJob"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.jobs.BSingleDMOJob" name="SingleDMOJob"/>
   <!--com.danboisemechanical.DanboiseControls.se.workers-->
   <type class="com.danboisemechanical.DanboiseControls.se.workers.BSysBuilderWorker" name="SysBuilderWorker"/>
   <type class="com.danboisemechanical.DanboiseControls.se.workers.BAlarmBuilderWorker" name="AlarmBuilderWorker"/>
@@ -21,11 +22,21 @@
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder" name="PRNBuilder"/>
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder" name="TagBuilder"/>
   <type class="com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder" name="AlarmBuilder"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.builders.BDMOBuilder" name="DMOBuilder"/>
   <!--com.danboisemechanical.DanboiseControls.se.models.builder_rules-->
   <type class="com.danboisemechanical.DanboiseControls.se.models.builder_rules.BTagRule" name="TagRule"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.builder_rules.BFilter" name="Filter"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.builder_rules.BFilterGroup" name="FilterGroup"/>
   <!--com.danboisemechanical.DanboiseControls.se.utils.alarms-->
   <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BAlarmMaker" name="AlarmMaker"/>
   <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BAlarmUtil" name="AlarmUtil"/>
   <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BFireAlmMaker" name="FireAlmMaker"/>
   <type class="com.danboisemechanical.DanboiseControls.se.utils.alarms.BHiTempAlmMaker" name="HiTempAlmMaker"/>
+  <!--com.danboisemechanical.DanboiseControls.se.models.n2-->
+  <type class="com.danboisemechanical.DanboiseControls.se.models.n2.BJciN2BoolPoint" name="JciN2BoolPoint"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.n2.BJciN2BoolWritable" name="JciN2BoolWritable"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.n2.BJciN2EnumPoint" name="JciN2EnumPoint"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.n2.BJciN2EnumWritable" name="JciN2EnumWritable"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.n2.BJciN2NumPoint" name="JciN2NumPoint"/>
+  <type class="com.danboisemechanical.DanboiseControls.se.models.n2.BJciN2NumWritable" name="JciN2NumWritable"/>
 </types>

@@ -18,17 +18,15 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PRNParser {
 
     //METHODS
     public N2DevDef parseN2Dev(BOrd fileOrd, BPRNBuilder caller, BSinglePRNJob job){
-        BOrd ord = fileOrd;
         String[] props = new String[10];
         int breakCnt = 0;
         try{
-            BIFile prnFile = (BIFile)ord.get(caller);
+            BIFile prnFile = (BIFile)fileOrd.get(caller);
             InputStreamReader in = new InputStreamReader(prnFile.getInputStream());
             try{
                 BufferedReader bin = new BufferedReader(in);
@@ -91,35 +89,59 @@ public class PRNParser {
                 BufferedReader bin = new BufferedReader(in);
                 String str;
                 int cnt = 0;
+                String[] objProps = null;
+                String pointType = "";
                 try{
                     while((str = bin.readLine()) != null){
 
                         if(job.getCanceled()) throw new JobCancelException();
+
+                        logger.info("PRNParser...str: "+str);
+
+                        objProps = str.split("\\s{3,}+");
+                        pointType = this.filter("[A-Z]", objProps[0]);
+                        for(int i = 0; i < objProps.length; i++){
+                            logger.severe(objProps[i]);
+                        }
+
+                        logger.info("objProps[0]: "+objProps[0]+"\tpointType: "+pointType);
                         if(p.matcher(str).matches()){
-                            String[] objProps = str.split("\\s{3,}+");
-                            String pointType = this.filter("[A-Z]", objProps[0]);
                             if(objProps.length == 4){
                                 n2Points.add(N2PointDef.make(pointType, Integer.parseInt(objProps[1]), objProps[2], objProps[3], null));
+                                job.log().message("PRNParser..."+objProps[1]+ objProps[2]+ objProps[3]);
+                                logger.info("PRNParser...objProps length: "+objProps.length+"\t"+objProps[1]+ objProps[2]+ objProps[3]);
                             }
                             else if(objProps.length == 5){
                                 n2Points.add(N2PointDef.make(pointType, Integer.parseInt(objProps[1]), objProps[2], objProps[3], objProps[4]));
-                                job.log().message("PRNParser..."+Arrays.asList(objProps).stream().collect(Collectors.joining(",")));
+                                job.log().message("PRNParser..."+objProps[1]+ objProps[2]+ objProps[3]+ objProps[4]);
+                                logger.info("PRNParser..."+objProps.length+"\t"+objProps[1]+ objProps[2]+ objProps[3]+ objProps[4]);
                             }else if(objProps.length == 6){
                                 n2Points.add(N2PointDef.make(pointType, Integer.parseInt(objProps[1]), objProps[2], objProps[3], objProps[5]));
-                                job.log().message("PRNParser..."+Arrays.asList(objProps).stream().filter(e-> e.equals(objProps[4]))
-                                        .collect(Collectors.joining(",")));
+                                job.log().message("PRNParser..."+objProps[1]+ objProps[2]+ objProps[3]+ objProps[5]);
+                                logger.info("PRNParser..."+objProps.length+"\t"+objProps[1]+ objProps[2]+ objProps[3]+ objProps[5]);
                             }else{
                                 logger.warning("PRNParser:121...NOT INCLUDED !!!!!\n"+
                                         Arrays.asList(objProps).stream().collect(Collectors.joining(",")));
                                 job.log().message("PRNParser...Length: "+objProps.length);
+                                logger.severe("\nPRNParser ERROR - Obj Props: ("+objProps.length+")");
+                                for(int i = 0; i < objProps.length; i++){
+                                    logger.severe(objProps[i]);
+                                }
                             }
+                        }else{
+                            logger.info("ERROR...Regex Pattern did not match...!!!");
                         }
                         ++cnt;
-                        //job.progress((int)((double)cnt / (double)nOfLines)*100);
                     }
                 }catch(IOException ioe){
                     logger.severe("PRNParser:130 - File IO - Unknown file exception while trying to open the file from the ord specified...!!\n"
                             + ioe.getCause());
+                }catch(Exception e){
+                    logger.severe(e.getMessage().concat("\nPRNParser ERROR - Obj Props: ("+objProps.length+")"));
+                    for(int i = 0; i < objProps.length; i++){
+                        logger.severe(objProps[i]);
+                    }
+                    e.printStackTrace();
                 }
                 job.progress(100);
 
