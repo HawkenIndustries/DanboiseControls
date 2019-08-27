@@ -1,6 +1,7 @@
 package com.danboisemechanical.DanboiseControls.se.services;
 
 import com.danboisemechanical.DanboiseControls.se.builders.BAlarmBuilder;
+import com.danboisemechanical.DanboiseControls.se.builders.BDMOBuilder;
 import com.danboisemechanical.DanboiseControls.se.builders.BPRNBuilder;
 import com.danboisemechanical.DanboiseControls.se.builders.BTagBuilder;
 
@@ -15,6 +16,12 @@ import java.util.logging.Logger;
         name = "PRNBuilder",
         type = "DanboiseControls:PRNBuilder",
         defaultValue = "BPRNBuilder.make()",
+        flags = Flags.SUMMARY
+)
+@NiagaraProperty(
+        name = "DMOBuilder",
+        type = "DanboiseControls:DMOBuilder",
+        defaultValue = "BDMOBuilder.make()",
         flags = Flags.SUMMARY
 )
 @NiagaraProperty(
@@ -35,8 +42,8 @@ import java.util.logging.Logger;
 
 public class BSysBuilderService extends BAbstractService {
 /*+ ------------ BEGIN BAJA AUTO GENERATED CODE ------------ +*/
-/*@ $com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService(3847424386)1.0$ @*/
-/* Generated Sat Jul 06 08:45:10 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
+/*@ $com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService(3919483139)1.0$ @*/
+/* Generated Wed Aug 21 13:15:32 EDT 2019 by Slot-o-Matic (c) Tridium, Inc. 2012 */
 
 ////////////////////////////////////////////////////////////////
 // Property "PRNBuilder"
@@ -60,6 +67,29 @@ public class BSysBuilderService extends BAbstractService {
    * @see #PRNBuilder
    */
   public void setPRNBuilder(BPRNBuilder v) { set(PRNBuilder, v, null); }
+
+////////////////////////////////////////////////////////////////
+// Property "DMOBuilder"
+////////////////////////////////////////////////////////////////
+  
+  /**
+   * Slot for the {@code DMOBuilder} property.
+   * @see #getDMOBuilder
+   * @see #setDMOBuilder
+   */
+  public static final Property DMOBuilder = newProperty(Flags.SUMMARY, BDMOBuilder.make(), null);
+  
+  /**
+   * Get the {@code DMOBuilder} property.
+   * @see #DMOBuilder
+   */
+  public BDMOBuilder getDMOBuilder() { return (BDMOBuilder)get(DMOBuilder); }
+  
+  /**
+   * Set the {@code DMOBuilder} property.
+   * @see #DMOBuilder
+   */
+  public void setDMOBuilder(BDMOBuilder v) { set(DMOBuilder, v, null); }
 
 ////////////////////////////////////////////////////////////////
 // Property "TagBuilder"

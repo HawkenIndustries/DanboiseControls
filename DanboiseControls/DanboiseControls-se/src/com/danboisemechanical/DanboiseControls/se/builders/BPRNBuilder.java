@@ -186,7 +186,7 @@ public class BPRNBuilder extends BComponent {
                             in.close();
                     }
             }catch(UnresolvedException ue){
-                    logger.severe("PRNBuilder:219 File ORD is unresolved...!!\n"+ue.getCause());
+                    logger.severe("PRNBuilder File ORD is unresolved...!!\n"+ue.getCause());
             }catch(IOException ioe){
                     logger.severe("PRNBuilder:221 File IO - Unknown file handling exception...!!\n"+ioe.getCause());
             }
@@ -212,14 +212,13 @@ public class BPRNBuilder extends BComponent {
     //PRIVATE FIELDS
     private ArrayList<String> prnLines = new ArrayList<>();
     private static Logger logger = Logger.getLogger("DMI_SysBuilder_PRNBuilder");
-    private static Type[] serviceTypes = new Type[]{TYPE};
 
     //CLASS METHODS
 
     public ArrayList<String> getPRNLines(){
             if(prnLines != null){ return prnLines;
             }else{
-                    logger.warning("PRNBuilder:218 Couldn't do getPRNLines() because prnLines field is null...!!!");
+                    logger.warning("PRNBuilder Couldn't do getPRNLines() because prnLines field is null...!!!");
                     return new ArrayList<>();
             }
     }
@@ -228,7 +227,7 @@ public class BPRNBuilder extends BComponent {
                     prnLines = list;
             } else {
 
-                    logger.warning("PRNBuilder:227 Couldn't do setPRNLines() because the list argument is null...!!!");
+                    logger.warning("PRNBuilder Couldn't do setPRNLines() because the list argument is null...!!!");
             }
     }
 

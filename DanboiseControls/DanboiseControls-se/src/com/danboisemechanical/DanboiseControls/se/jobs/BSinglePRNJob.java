@@ -46,23 +46,30 @@ public class BSinglePRNJob extends BSimpleJob {
   @Override
   public void run(Context cx) throws Exception{
 
-    BPRNBuilder builder = ((BSysBuilderService)Sys.getService(BSysBuilderService.TYPE)).getPRNBuilder();
+    BPRNBuilder builder = ((BSysBuilderService)Sys.getService(BSysBuilderService.TYPE)).getPRNBuilder();//REFERENCE TO THE PRN BUILDER OBJ
 
-    n2Dev = prn.parseN2Dev(builder.getFileOrd(), builder, this);
-    n2PointList = prn.parseN2Points(builder.getFileOrd(), builder, this);
+    n2Dev = prn.parseN2Dev(builder.getFileOrd(), builder, this);//INSTANCE OF THE N2 DEVICE DEFINITION CLASS
+    n2PointList = prn.parseN2Points(builder.getFileOrd(), builder, this);//INSTANCE OF THE LIST OF N2 POINT DEFINITIONS PARSED FROM FILE
 
-    BComponent drivers = BOrd.make("slot:/Drivers").resolve(Sys.getStation()).getComponent();
+    BComponent drivers = BOrd.make("slot:/Drivers").resolve(Sys.getStation()).getComponent();//REFERENCE TO THE DRIVER CONTAINER
     Arrays.stream(drivers.getChildComponents()).forEach(e -> {
+
+        //ITERATE THE DRIVER'S CHILDREN AND FIND THE N2 NETWORK
         if(e.getType().getTypeName().equals("JciN2Network")){
             BJciN2Network n2 = (BJciN2Network)e;
             BJciN2ODevice dev = new BJciN2ODevice();
             String name = "";
 
-            name = n2Dev.getDevName().replaceAll("[^A-Za-b0-9]", "");
+            //MAKE SURE THE DEVICE NAME IS LEGAL
+            name = n2Dev.getDevName().replaceAll("[^A-Za-z0-9]", "");
 
+            //MAKE AN N2 DEVICE POINT EXTENSION
             BJciN2OPointDeviceExt devExt = new BJciN2OPointDeviceExt();
+
+            //ITERATE THE POINT DEFINITIONS IN THE LIST
             n2PointList.stream().forEach(i -> {
 
+                //PLACEHOLDERS FOR THE POINT DEFINITION PROPERTIES
                 String pointType = i.getPointType();
                 String shortName = i.getShortName();
                 String longName = i.getLongName();
@@ -70,11 +77,13 @@ public class BSinglePRNJob extends BSimpleJob {
 
                 try{
 
+                    //MAKE AN AI NUMERIC POINT WITH FACETS
                     if(i.getPointType().equals("AI")){
-
                         BNumericPoint np = new BNumericPoint();
                         BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
                         String pointName = i.getShortName().replaceAll("-", "_");
+
+                        //SET THE POINT'S PROXY EXTENSION PROPERTIES
                         proxyExt.set("networkPointType", BJciN2ObjectType.analogInput);
                         proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
                         proxyExt.set("shortName", BString.make(pointName));
@@ -90,22 +99,31 @@ public class BSinglePRNJob extends BSimpleJob {
                             np.setFacets(BFacets.makeNumeric(BUnit.getUnit("pounds per square inch"), 1));
                         }else if(i.getPointUnits().equals("ppm")){
                             np.setFacets(BFacets.makeNumeric(BUnit.getUnit("parts per million"),0));
+                        }else if(i.getPointUnits().equals("seconds")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("second"), 0));
                         }else if(i.getPointUnits().equals("min")){
                             np.setFacets(BFacets.makeNumeric(BUnit.getUnit("minute"),0));
+                        }else if(i.getPointUnits().equals("hr")){
+                            np.setFacets(BFacets.makeNumeric(BUnit.getUnit("hour"), 0));
                         }else if(i.getPointUnits().equals("%")){
                             np.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent"), 0));
                         }
                         else{
-                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:101");
+                            logger.warning("Making AI point; units parsed from prn file not matched!!...BSinglePRNJob.java");
                         }
 
+                        //ADD POINT TO THE DEVICE POINT EXTENSION
                         devExt.add(pointName, np);
+                        //SET DISPLAY NAME FOR POINT GENERATED ON ITS DEVICE POINT EXTENSION
                         devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(i.getLongName()), null);
 
-                    }else if(i.getPointType().equals("AO") || i.getPointType().equals("ADF") ||
+                    //MAKE AN AO, ADI, OR ADF A NUMERIC WRITABLE, BASED ON FACET CONTEXT,
+                    }else if((i.getPointType().equals("AO") || i.getPointType().equals("ADF"))  ||
                             (i.getPointType().equals("ADI") && i.getPointUnits().equals("min")) ||
-                            i.getPointType().equals("ADI") && i.getPointUnits().equals("ft")){
-
+                            (i.getPointType().equals("ADI") && i.getPointUnits().equals("ft"))  ||
+                            (i.getPointType().equals("ADI") && i.getPointUnits().equals("hr"))  ||
+                            (i.getPointType().equals("ADI") && i.getPointUnits().equals("sec"))
+                    ){
 
                         BNumericWritable nw = new BNumericWritable();
                         BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
@@ -117,17 +135,19 @@ public class BSinglePRNJob extends BSimpleJob {
 
                         }catch(Exception ex){}
 
+
                         if(i.getPointType().equals("AO")){
                             proxyExt.set("networkPointType", BJciN2ObjectType.analogOutput);
                         }else if( i.getPointType().equals("ADI")){
                             proxyExt.set("networkPointType", BJciN2ObjectType.analogDataInteger);
-                        }else{
+                        }else if(i.getPointType().equals("ADF")){
                             proxyExt.set("networkPointType", BJciN2ObjectType.analogDataFloat);
                         }
                         proxyExt.set("networkPointAddress", BInteger.make(i.getPointAddress()));
                         proxyExt.set("shortName", BString.make(pointName));
                         proxyExt.set("longName", BString.make(i.getLongName()));
                         nw.setProxyExt(proxyExt);
+
                         try{
                             if(i.getPointUnits().equals("%")){
                                 nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("percent"),0));
@@ -141,13 +161,17 @@ public class BSinglePRNJob extends BSimpleJob {
                                 nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("pounds per square inch"), 1));
                             }else if(i.getPointUnits().equals("ppm")){
                                 nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("parts per million"),0));
+                            }else if(i.getPointUnits().equals("sec")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("second"), 0));
                             }else if(i.getPointUnits().equals("min")){
                                 nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("minute"),0));
+                            }else if(i.getPointUnits().equals("hr")){
+                                nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("hour"), 0));
                             }else if(i.getPointUnits().equals("ft")){
                                 nw.setFacets(BFacets.makeNumeric(BUnit.getUnit("foot"), 0));
                             }
                             else{
-                                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:158");
+                                logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java");
                             }
                         }catch(NullPointerException npe){}
 
@@ -172,7 +196,7 @@ public class BSinglePRNJob extends BSimpleJob {
                             bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("Alarm"),
                                     BFacets.FALSE_TEXT, BString.make("Normal")));
                         }else{
-                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:188");
+                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java");
                         }
 
                         devExt.add(pointName, bp);
@@ -193,7 +217,7 @@ public class BSinglePRNJob extends BSimpleJob {
                             bp.setFacets(BFacets.make(BFacets.TRUE_TEXT, BString.make("On"),
                                     BFacets.FALSE_TEXT, BString.make("Off")));
                         }else{
-                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java:214");
+                            logger.warning("[WARNING] point units parsed from prn file not matched!!...BSinglePRNJob.java");
                         }
 
                         devExt.add(pointName, bp);
@@ -227,21 +251,21 @@ public class BSinglePRNJob extends BSimpleJob {
                         }catch(NullPointerException npe){
 
                         }catch(IllegalNameException ine){
-                            logger.severe("[ERROR] BSinglePRNJob.java:253 -- IllegalNameException ADI - ENUMS...!!!\t"+
+                            logger.severe("[ERROR] BSinglePRNJob.java-- IllegalNameException ADI - ENUMS...!!!\t"+
                                     i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress()+"\n"+ine.getStackTrace().toString());
-                            log().message("[ERROR] BSinglePRNJob.java:255 -- IllegalNameException ADI - ENUMS...!!!\t"+
+                            log().message("[ERROR] BSinglePRNJob.java-- IllegalNameException ADI - ENUMS...!!!\t"+
                                     i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress()+"\n");
                         }catch(Exception ex){
                             logger.severe(ex.getMessage());
                             ex.printStackTrace();
                         }
 
-                    }else{ logger.warning("[WARNING] point type parsed from prn file not matched!!...BSinglePRNJob.java:264"
+                    }else{ logger.warning("[WARNING] point type parsed from prn file not matched!!...BSinglePRNJob.java"
                             .concat("\n".concat(i.getShortName()+"\t"+i.getPointType()+":"+i.getPointAddress())));
                     }
                 }catch(Exception catchAll){
                     logger.severe("[ERROR] BSinglePRNJob.java:254 -- CATCH ALL...!!!\n"+ catchAll.getStackTrace().toString());
-                    log().message("[ERROR] BSinglePRNJob.java:167-- CATCH ALL EXCEPTION HANDLER...!!!\n"+
+                    log().message("[ERROR] BSinglePRNJob.java-- CATCH ALL EXCEPTION HANDLER...!!!\n"+
                             i.getShortName()+" - "+i.getPointType()+":"+i.getPointAddress()+
                             catchAll.getStackTrace().toString());
                 }
@@ -261,7 +285,6 @@ public class BSinglePRNJob extends BSimpleJob {
             this.log().message("JciN2Network NOT FOUND ... while attempting to add n2 device from PRN file...!!! - BSinglePRNJob");
         }
     });
-
   }
 
   public void doCancel(Context cx){
