@@ -7,14 +7,12 @@
 define([
     'bajaux/Widget',
     'bajaux/mixin/subscriberMixIn',
-    'd3',
     'baja!driver:Device',
     'baja!control:NumericPoint',
     'baja!control:BooleanPoint',
     'baja!control:NumericWritable',
     'baja!control:BooleanWritable',
     'baja!',
-    'd3',
     'nmodule/DanboiseControls/res/jqm/jquery.mobile-1.4.5.min.js',
     'nmodule/DanboiseControls/res/jqm/jquery.mobile-1.4.5.min.map',
     'css!nmodule/DanboiseControls/res/jqm/jquery.mobile-1.4.5.min.css',
@@ -31,7 +29,6 @@ define([
     bPoint,
     bWritable,
     baja,
-    d3,
     jqm
 ){
     'use strict';
@@ -45,10 +42,9 @@ define([
     FloorplanZone.prototype = Object.create(widget.prototype);
     FloorplanZone.prototype.constructor = FloorplanZone
 
-    FloorplanZone.prototype.doInitialize = function(element){
+    FloorplanZone.prototype.doInitialize = function(e){
         var self = this;
-        var w = d3.select(element[0])
-            .append('<h1>VAV Name</h1>');
+        
     }
 
     

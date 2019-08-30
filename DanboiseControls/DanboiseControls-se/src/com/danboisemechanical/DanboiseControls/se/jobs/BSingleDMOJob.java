@@ -6,12 +6,11 @@ import com.danboisemechanical.DanboiseControls.se.models.n2.N2PointDef;
 import com.danboisemechanical.DanboiseControls.se.services.BSysBuilderService;
 import com.danboisemechanical.DanboiseControls.se.utils.n2parsers.DMOParser;
 import com.jci.jcin2.BJciN2Network;
-import com.jci.jcin2.BJciN2ODevice;
+import com.jci.jcin2.BJciDx9100Device;
+import com.jci.jcin2.point.BJciS91PointDeviceExt;
+import com.jci.jcin2.point.BJciS91BooleanProxyExt;
+import com.jci.jcin2.point.BJciS91NumericProxyExt;
 import com.jci.jcin2.enums.BJciN2ObjectType;
-import com.jci.jcin2.point.BJciN2OBooleanProxyExt;
-import com.jci.jcin2.point.BJciN2OEnumProxyExt;
-import com.jci.jcin2.point.BJciN2ONumericProxyExt;
-import com.jci.jcin2.point.BJciN2OPointDeviceExt;
 
 import javax.baja.control.*;
 import javax.baja.job.BSimpleJob;
@@ -65,12 +64,12 @@ public class BSingleDMOJob extends BSimpleJob {
     Arrays.stream(drivers.getChildComponents()).forEach(e ->{
       if(e.getType().getTypeName().equals("JciN2Network")){
         BJciN2Network n2 = (BJciN2Network)e;
-        BJciN2ODevice dev = new BJciN2ODevice();
+        BJciDx9100Device dev = new BJciDx9100Device();
         String name;
 
         name = n2Dev.getDevName().replaceAll("[^A-Za-z0-9]", "");
 
-        BJciN2OPointDeviceExt devExt = new BJciN2OPointDeviceExt();
+        BJciS91PointDeviceExt devExt = new BJciS91PointDeviceExt();
 
         n2PointList.stream().forEach(i -> {
           String pointType =  i.getPointType();
@@ -86,7 +85,7 @@ public class BSingleDMOJob extends BSimpleJob {
 
           try{
             if(pointType.equals("AI")){
-              BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
+              BJciS91NumericProxyExt proxyExt = new BJciS91NumericProxyExt();
               BControlPoint ai = null;
               if(isWritable){
                 ai = new BNumericWritable();
@@ -133,7 +132,7 @@ public class BSingleDMOJob extends BSimpleJob {
             }else if((pointType.equals("AO") || pointType.equals("AD"))
             ){
               BControlPoint ad = null;
-              BJciN2ONumericProxyExt proxyExt = new BJciN2ONumericProxyExt();
+              BJciS91NumericProxyExt proxyExt = new BJciS91NumericProxyExt();
               if(i.getShortName().contains("-") ) pointName = pointName.replaceAll("-", "_");
               try{
                 int n = Integer.parseInt(pointName.substring(0,1));
@@ -212,7 +211,7 @@ public class BSingleDMOJob extends BSimpleJob {
               }else{
                 bi = new BBooleanPoint();
               }
-              BJciN2OBooleanProxyExt proxyExt = new BJciN2OBooleanProxyExt();
+              BJciS91BooleanProxyExt proxyExt = new BJciS91BooleanProxyExt();
               proxyExt.set("networkPointType", BJciN2ObjectType.binaryInput);
               proxyExt.set("networkPointAddress", BInteger.make(pointAddr));
               proxyExt.set("shortName", BString.make(pointName));
@@ -241,7 +240,7 @@ public class BSingleDMOJob extends BSimpleJob {
               }else{
                 bo = new BBooleanPoint();
               }
-              BJciN2OBooleanProxyExt proxyExt = new BJciN2OBooleanProxyExt();
+              BJciS91BooleanProxyExt proxyExt = new BJciS91BooleanProxyExt();
               if(pointType.equals("BD")) proxyExt.set("networkPointType", BJciN2ObjectType.binaryData);
               if(pointType.equals("BO")) proxyExt.set("networkPointType", BJciN2ObjectType.binaryOutput);
               proxyExt.set("networkPointAddress", BInteger.make(pointAddr));
@@ -259,43 +258,6 @@ public class BSingleDMOJob extends BSimpleJob {
               devExt.setDisplayName(devExt.getProperty(pointName), BFormat.make(longName), null);
 
             }
-//            else if(pointType.equals("AD")){
-//
-//              BEnumWritable ew = new BEnumWritable();
-//              BJciN2OEnumProxyExt proxyExt = new BJciN2OEnumProxyExt();
-//              String pointName = i.getShortName().replaceAll("-", "_");
-//              proxyExt.set("networkPointType", BJciN2ObjectType.analogDataInteger);
-//              proxyExt.set("networkPointAddress", BInteger.make(pointAddr));
-//              proxyExt.set("shortName", BString.make(pointName));
-//              proxyExt.set("longName", BString.make(longName));
-//              try{
-//                if(units.contains("/")){
-//                  String[] enumUnits = units.split("/");
-//                  for(int it = 0; it < enumUnits.length; it++){
-//                    dmo.filter("[A-Z]", enumUnits[it]);
-//                  }
-//                  BEnumRange range = BEnumRange.make(enumUnits);
-//                  BDynamicEnum dyEnum = BDynamicEnum.make(enumUnits.length, range);
-//                  ew.set(dyEnum);
-//                }else{
-//                  logger.warning("[WARNING] Enum point not added due to lack of state defs!!!\t"+
-//                          i.getShortName()+"\t"+pointType+":"+pointAddr);
-//                  log().message("[WARNING] Enum point not added due to lack of state defs!!!\t"+
-//                          i.getShortName()+"\t"+pointType+":"+pointAddr);
-//                }
-//              }catch(NullPointerException npe){
-//
-//              }catch(IllegalNameException ine){
-//                logger.severe("[ERROR] BSingleDMOJob.java-- IllegalNameException ADI - ENUMS...!!!\t"+
-//                        i.getShortName()+"\t"+pointType+":"+pointAddr+"\n"+ine.getStackTrace().toString());
-//                log().message("[ERROR] BSingleDMOJob.java-- IllegalNameException ADI - ENUMS...!!!\t"+
-//                        i.getShortName()+"\t"+pointType+":"+pointAddr+"\n");
-//              }catch(Exception ex){
-//                logger.severe(ex.getMessage());
-//                ex.printStackTrace();
-//              }
-//
-//            }
             else{
               logger.warning("DMO PARSER CAN'T IDENTIFY POINT TYPE: "+pointType);
               log().message("DMO PARSER CAN'T IDENTIFY POINT TYPE: "+pointType);
